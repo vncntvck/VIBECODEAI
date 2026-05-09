@@ -1,0 +1,13 @@
+{
+  "name": "fintjam-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "serve . -l $PORT"
+  },
+  "dependencies": {
+    "serve": "^14.2.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
