@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Fintjam Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <!-- SheetJS untuk export Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "error": "#ba1a1a",
+                        "primary": "#000000",
+                        "secondary": "#0051d5",
+                        "background": "#f8f9ff",
+                        "surface": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-surface-variant": "#45464d",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-20">
+    <!-- TopAppBar -->
+    <header class="fixed top-0 w-full z-50 bg-white border-b-2 border-black h-16">
+        <div class="flex justify-between items-center px-4 h-full max-w-[1200px] mx-auto">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined text-black text-3xl" data-icon="account_balance_wallet">account_balance_wallet</span>
+                <h1 class="text-xl font-bold text-black">Fintjam</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="exportExcel()" class="flex items-center gap-2 px-4 py-2 bg-white text-black font-bold border-2 border-black shadow-[2px_2px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-zinc-100">
+                    <span class="material-symbols-outlined text-[20px]">table_view</span>
+                    <span>Export Excel</span>
+                </button>
+                <button onclick="printLaporan()" class="flex items-center gap-2 px-4 py-2 bg-black text-white font-bold border-2 border-black shadow-[2px_2px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
+                    <span class="material-symbols-outlined" data-icon="print">print</span>
+                    <span>Print Laporan</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24 px-4 max-w-[1200px] mx-auto">
+        <!-- Bento Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+
+            <!-- Welcome Card (full width) -->
+            <div class="md:col-span-12 bg-black text-white border-2 border-black shadow-[4px_4px_0px_#555] p-5 flex items-center justify-between animate-fade-up">
+                <div class="flex items-center gap-4">
+                    <div class="w-11 h-11 bg-white text-black flex items-center justify-center border-2 border-white font-black text-lg" id="user-avatar">?</div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">Selamat datang kembali 👋</p>
+                        <p class="text-xl font-black" id="welcome-name">—</p>
+                    </div>
+                </div>
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs text-zinc-400 font-bold uppercase tracking-widest">Hari ini</p>
+                    <p class="text-sm font-bold" id="welcome-date">—</p>
+                </div>
+            </div>
+
+            <!-- Key Metrics Card (compact) -->
+            <div class="md:col-span-12 lg:col-span-4 bg-white border-2 border-black shadow-[4px_4px_0px_#000] p-6 space-y-4 card-hover animate-fade-up delay-1">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Total Saldo</h3>
+                <div class="space-y-1">
+                    <p id="total-balance" class="text-3xl font-bold">Rp 0</p>
+                    <p id="current-month-delta" class="text-sm font-bold text-secondary">+Rp 0 (Bulan ini)</p>
+                </div>
+                <div class="pt-4 border-t-2 border-black grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs font-bold text-gray-500">Pemasukan</p>
+                        <p id="total-income" class="font-bold text-success">Rp 0</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-500">Pengeluaran</p>
+                        <p id="total-expense" class="font-bold text-error">Rp 0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="md:col-span-12 lg:col-span-8 bg-white border-2 border-black shadow-[4px_4px_0px_#000] p-6 card-hover animate-fade-up delay-2">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-lg font-bold">Ringkasan Bulanan</h2>
+                        <p class="text-sm text-gray-500">Pemasukan vs Pengeluaran (6 Bulan Terakhir)</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="flex items-center gap-2 text-sm font-bold">
+                            <div class="w-3 h-3 bg-secondary"></div>
+                            <span>Masuk</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm font-bold">
+                            <div class="w-3 h-3 bg-error"></div>
+                            <span>Keluar</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Bar Chart -->
+                <div id="monthly-chart" class="h-52 flex items-end justify-between gap-3 border-b-2 border-black pb-1">
+                    <!-- Bars injected by JS -->
+                </div>
+                <!-- Budget Bar -->
+                <div class="space-y-2 mt-6 pt-5 border-t-2 border-black">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Limit Bulan Ini</span>
+                        <span id="budget-limit" class="text-xs font-bold">Limit: Rp 0</span>
+                    </div>
+                    <div class="w-full h-4 bg-zinc-200 border-2 border-black overflow-hidden flex">
+                        <div id="budget-progress-bar" class="h-full bg-secondary transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs font-bold">
+                        <span id="budget-used">Rp 0 terpakai</span>
+                        <span id="budget-pct">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction List -->
+            <div class="md:col-span-12 bg-white border-2 border-black shadow-[4px_4px_0px_#000] overflow-hidden card-hover animate-fade-up delay-3">
+                <div class="px-6 py-4 border-b-2 border-black flex justify-between items-center">
+                    <h3 class="text-lg font-bold">Transaksi Terbaru</h3>
+                    <a href="riwayat.html" class="text-secondary font-bold hover:underline">Lihat Semua</a>
+                </div>
+                <div id="recent-transactions" class="divide-y-2 divide-black">
+                    <!-- Items injected by JS -->
+                    <div class="p-8 text-center text-gray-500">Belum ada transaksi.</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FAB -->
+    <div class="fixed bottom-24 right-4 z-40">
+        <a href="transactions.html" class="w-14 h-14 bg-black text-white flex items-center justify-center border-2 border-black shadow-[4px_4px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all fab-pulse">
+            <span class="material-symbols-outlined text-2xl" data-icon="add">add</span>
+        </a>
+    </div>
+
+    <!-- BottomNavBar -->
+    <nav class="fixed bottom-0 w-full z-50 border-t-2 border-black bg-white">
+        <div class="flex justify-around items-center h-16 max-w-[1200px] mx-auto">
+            <a href="index.html" class="flex flex-col items-center justify-center text-secondary font-bold">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                <span class="text-xs">Dashboard</span>
+            </a>
+            <a href="transactions.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+                <span class="material-symbols-outlined">add_circle</span>
+                <span class="text-xs">Transaksi</span>
+            </a>
+            <a href="riwayat.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black transition-colors">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="text-xs">Riwayat</span>
+            </a>
+            <a href="settings.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="text-xs">Setelan</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        const user = Storage.getCurrentUser();
+        const transactions = Storage.getTransactions(user.id);
+
+        function renderDashboard() {
+            // Calculations
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+            const totalExpense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+            const balance = totalIncome - totalExpense;
+
+            const now = new Date();
+            const currentMonthTransactions = transactions.filter(t => {
+                const d = new Date(t.date);
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            });
+            const currentMonthExpense = currentMonthTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+            const currentMonthIncome = currentMonthTransactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+            const delta = currentMonthIncome - currentMonthExpense;
+
+            // UI Update
+            document.getElementById('total-balance').textContent = Utils.formatCurrency(balance);
+            document.getElementById('total-income').textContent = Utils.formatCurrency(totalIncome);
+            document.getElementById('total-expense').textContent = Utils.formatCurrency(totalExpense);
+            document.getElementById('current-month-delta').textContent = `${delta >= 0 ? '+' : ''}${Utils.formatCurrency(delta)} (Bulan ini)`;
+
+            // Welcome card
+            const nameEl   = document.getElementById('welcome-name');
+            const avatarEl = document.getElementById('user-avatar');
+            const dateEl   = document.getElementById('welcome-date');
+            nameEl.textContent   = user.username;
+            avatarEl.textContent = user.username.charAt(0).toUpperCase();
+            dateEl.textContent   = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            
+            // Budget UI
+            const limit = user.monthlyLimit;
+            const percentage = limit > 0 ? Math.min(100, (currentMonthExpense / limit) * 100) : 0;
+            document.getElementById('budget-progress-bar').style.width = percentage + '%';
+            document.getElementById('budget-used').textContent = `${Utils.formatCurrency(currentMonthExpense)} terpakai`;
+            document.getElementById('budget-limit').textContent = `Limit: ${Utils.formatCurrency(limit)}`;
+            document.getElementById('budget-pct').textContent = percentage.toFixed(1) + '%';
+
+            if (percentage >= 100) document.getElementById('budget-progress-bar').classList.replace('bg-secondary', 'bg-error');
+
+            // ── Monthly Bar Chart (6 bulan terakhir) ──
+            const MONTHS_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+            const monthData = [];
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const m = d.getMonth();
+                const y = d.getFullYear();
+                const txMonth = transactions.filter(t => {
+                    const td = new Date(t.date);
+                    return td.getMonth() === m && td.getFullYear() === y;
+                });
+                monthData.push({
+                    label: MONTHS_ID[m],
+                    income:  txMonth.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0),
+                    expense: txMonth.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0),
+                });
+            }
+
+            const maxVal = Math.max(...monthData.flatMap(m => [m.income, m.expense]), 1);
+
+            const chartEl = document.getElementById('monthly-chart');
+            chartEl.innerHTML = monthData.map((m, i) => {
+                const incPct  = Math.max(2, (m.income  / maxVal) * 100);
+                const expPct  = Math.max(2, (m.expense / maxVal) * 100);
+                const delay   = 0.5 + i * 0.08;
+                const isEmpty = m.income === 0 && m.expense === 0;
+                return `
+                <div class="flex-1 flex flex-col items-center gap-1 h-full group">
+                    <div class="w-full flex flex-col items-center gap-[3px] h-full justify-end">
+                        <div class="relative w-full flex justify-center gap-[3px] items-end" style="height:100%">
+                            <!-- Tooltip -->
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] font-bold px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
+                                <div class="text-blue-300">+${Utils.formatCurrency(m.income)}</div>
+                                <div class="text-red-300">-${Utils.formatCurrency(m.expense)}</div>
+                            </div>
+                            ${isEmpty
+                                ? `<div class="w-4 bg-zinc-200 border border-zinc-300" style="height:4px"></div>`
+                                : `<div class="w-4 bg-secondary border-2 border-black chart-bar" style="height:${incPct}%;animation-delay:${delay}s" title="Masuk: ${Utils.formatCurrency(m.income)}"></div>
+                                   <div class="w-4 bg-error border-2 border-black chart-bar" style="height:${expPct}%;animation-delay:${delay + 0.04}s" title="Keluar: ${Utils.formatCurrency(m.expense)}"></div>`
+                            }
+                        </div>
+                    </div>
+                    <span class="text-[11px] font-bold text-gray-500 mt-1">${m.label}</span>
+                </div>`;
+            }).join('');
+
+            // Recent Transactions
+            const recentList = document.getElementById('recent-transactions');
+            if (transactions.length > 0) {
+                recentList.innerHTML = transactions.slice(-5).reverse().map((t, i) => `
+                    <div class="px-6 py-4 flex items-center justify-between hover:bg-zinc-50 transition-colors tx-row" style="animation-delay:${0.5 + i * 0.1}s">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center border-2 border-black rounded bg-zinc-100">
+                                <span class="material-symbols-outlined text-black">${t.type === 'income' ? 'payments' : 'shopping_bag'}</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">${t.note || t.category}</p>
+                                <div class="flex gap-2 items-center">
+                                    <span class="px-2 py-0.5 bg-zinc-200 border border-black text-[10px] font-bold uppercase">${t.category}</span>
+                                    <span class="text-xs text-gray-500">${new Date(t.date).toLocaleDateString('id-ID')}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="font-bold ${t.type === 'income' ? 'text-success' : 'text-error'}">
+                            ${t.type === 'income' ? '+' : '-'}${Utils.formatCurrency(t.amount)}
+                        </p>
+                    </div>
+                `).join('');
+            }
+            
+            UI.updateBudgetAlerts(user, transactions);
+        }
+
+        function exportExcel() {
+            const now = new Date();
+            const bulanTahun = now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+            const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // ── Sheet 1: Semua Transaksi ──
+            const txRows = sorted.map(t => ({
+                'Tanggal':    new Date(t.date).toLocaleDateString('id-ID'),
+                'Catatan':    t.note || '-',
+                'Kategori':   t.category,
+                'Tipe':       t.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
+                'Nominal (IDR)': t.amount,
+            }));
+
+            // ── Sheet 2: Ringkasan ──
+            const totalIncome  = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+            const totalExpense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+
+            const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            const summaryRows = [];
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const m = d.getMonth(), y = d.getFullYear();
+                const txMonth = transactions.filter(t => {
+                    const td = new Date(t.date);
+                    return td.getMonth() === m && td.getFullYear() === y;
+                });
+                summaryRows.push({
+                    'Bulan':              `${MONTHS_ID[m]} ${y}`,
+                    'Pemasukan (IDR)':    txMonth.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0),
+                    'Pengeluaran (IDR)':  txMonth.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0),
+                    'Selisih (IDR)':      txMonth.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+                                        - txMonth.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0),
+                });
+            }
+            summaryRows.push({});
+            summaryRows.push({
+                'Bulan': 'TOTAL KESELURUHAN',
+                'Pemasukan (IDR)':   totalIncome,
+                'Pengeluaran (IDR)': totalExpense,
+                'Selisih (IDR)':     totalIncome - totalExpense,
+            });
+
+            // Build workbook
+            const wb = XLSX.utils.book_new();
+
+            const wsTx = XLSX.utils.json_to_sheet(txRows.length > 0 ? txRows : [{ 'Info': 'Belum ada transaksi.' }]);
+            XLSX.utils.book_append_sheet(wb, wsTx, 'Transaksi');
+
+            const wsSummary = XLSX.utils.json_to_sheet(summaryRows);
+            XLSX.utils.book_append_sheet(wb, wsSummary, 'Ringkasan Bulanan');
+
+            // Set column widths
+            wsTx['!cols'] = [{ wch: 14 }, { wch: 28 }, { wch: 20 }, { wch: 14 }, { wch: 18 }];
+            wsSummary['!cols'] = [{ wch: 22 }, { wch: 20 }, { wch: 20 }, { wch: 18 }];
+
+            const fileName = `Fintjam_${user.username}_${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+
+        function printLaporan() {
+            const now = new Date();
+            const bulanTahun = now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+            const tanggalCetak = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+
+            // Hitung ringkasan
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+            const totalExpense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+            const balance = totalIncome - totalExpense;
+
+            const currentMonthTx = transactions.filter(t => {
+                const d = new Date(t.date);
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            });
+            const monthExpense = currentMonthTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+            const monthIncome  = currentMonthTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+            const limitPct = user.monthlyLimit > 0 ? Math.min(100, (monthExpense / user.monthlyLimit) * 100).toFixed(1) : 0;
+
+            // Urutkan semua transaksi dari terbaru
+            const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Baris tabel transaksi
+            const rows = sorted.length > 0
+                ? sorted.map((t, i) => `
+                    <tr style="background:${i % 2 === 0 ? '#fff' : '#f8f9ff'}">
+                        <td style="padding:10px 14px;border:1px solid #ddd;">${new Date(t.date).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'})}</td>
+                        <td style="padding:10px 14px;border:1px solid #ddd;">${t.note || '-'}</td>
+                        <td style="padding:10px 14px;border:1px solid #ddd;">${t.category}</td>
+                        <td style="padding:10px 14px;border:1px solid #ddd;text-align:center;">
+                            <span style="padding:2px 10px;font-size:11px;font-weight:700;border:1.5px solid ${t.type === 'income' ? '#166534' : '#ba1a1a'};color:${t.type === 'income' ? '#166534' : '#ba1a1a'};text-transform:uppercase;">
+                                ${t.type === 'income' ? 'Masuk' : 'Keluar'}
+                            </span>
+                        </td>
+                        <td style="padding:10px 14px;border:1px solid #ddd;text-align:right;font-weight:700;color:${t.type === 'income' ? '#166534' : '#ba1a1a'};">
+                            ${t.type === 'income' ? '+' : '-'}${Utils.formatCurrency(t.amount)}
+                        </td>
+                    </tr>`).join('')
+                : `<tr><td colspan="5" style="padding:24px;text-align:center;color:#888;">Belum ada transaksi.</td></tr>`;
+
+            const html = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <title>Laporan Keuangan Fintjam - ${bulanTahun}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #111;
+            background: #fff;
+            padding: 40px 48px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 3px solid #000;
+            padding-bottom: 20px;
+            margin-bottom: 28px;
+        }
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .brand-icon {
+            width: 40px; height: 40px;
+            background: #000;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; color: #fff; font-weight: 900;
+        }
+        .brand-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .brand-sub  { font-size: 11px; color: #555; margin-top: 2px; }
+        .report-meta { text-align: right; }
+        .report-meta h2 { font-size: 16px; font-weight: 700; }
+        .report-meta p  { font-size: 11px; color: #555; margin-top: 4px; }
+
+        /* Summary cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .summary-card {
+            border: 2px solid #000;
+            padding: 14px 16px;
+        }
+        .summary-card .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #555; margin-bottom: 6px; }
+        .summary-card .value { font-size: 18px; font-weight: 800; }
+        .summary-card .value.income  { color: #166534; }
+        .summary-card .value.expense { color: #ba1a1a; }
+        .summary-card .value.balance { color: #000; }
+        .summary-card .value.neutral { color: #0051d5; }
+
+        /* Budget bar */
+        .budget-section {
+            border: 2px solid #000;
+            padding: 16px 18px;
+            margin-bottom: 28px;
+        }
+        .budget-section h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+        .budget-bar-wrap { background: #e5e7eb; height: 18px; border: 1.5px solid #000; overflow: hidden; margin-bottom: 6px; }
+        .budget-bar-fill { height: 100%; background: #0051d5; }
+        .budget-bar-fill.over { background: #ba1a1a; }
+        .budget-labels { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; }
+
+        /* Month summary */
+        .month-section {
+            border: 2px solid #000;
+            padding: 16px 18px;
+            margin-bottom: 28px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .month-item .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #555; margin-bottom: 4px; }
+        .month-item .value { font-size: 15px; font-weight: 800; }
+
+        /* Table */
+        .table-section h3 {
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.8px; margin-bottom: 10px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: #000; color: #fff; }
+        thead th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        thead th:last-child { text-align: right; }
+        tbody tr:last-child td { border-bottom: 2px solid #000; }
+
+        /* Footer */
+        .report-footer {
+            margin-top: 32px;
+            padding-top: 14px;
+            border-top: 2px solid #000;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #888;
+        }
+
+        @media print {
+            body { padding: 20px 28px; }
+            @page { margin: 1cm; size: A4; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="report-header">
+        <div class="brand">
+            <div class="brand-icon">F</div>
+            <div>
+                <div class="brand-name">Fintjam</div>
+                <div class="brand-sub">Laporan Keuangan Personal</div>
+            </div>
+        </div>
+        <div class="report-meta">
+            <h2>Laporan Keuangan</h2>
+            <p>Periode: ${bulanTahun}</p>
+            <p>Dicetak: ${tanggalCetak}</p>
+            <p>Akun: <strong>${user.username}</strong></p>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="label">Total Saldo</div>
+            <div class="value balance">${Utils.formatCurrency(balance)}</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Total Pemasukan</div>
+            <div class="value income">${Utils.formatCurrency(totalIncome)}</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Total Pengeluaran</div>
+            <div class="value expense">${Utils.formatCurrency(totalExpense)}</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Limit Bulanan</div>
+            <div class="value neutral">${Utils.formatCurrency(user.monthlyLimit)}</div>
+        </div>
+    </div>
+
+    <!-- Budget Bar -->
+    <div class="budget-section">
+        <h3>Penggunaan Limit Bulan Ini</h3>
+        <div class="budget-bar-wrap">
+            <div class="budget-bar-fill ${parseFloat(limitPct) >= 100 ? 'over' : ''}" style="width:${limitPct}%"></div>
+        </div>
+        <div class="budget-labels">
+            <span>${Utils.formatCurrency(monthExpense)} terpakai (${limitPct}%)</span>
+            <span>Limit: ${Utils.formatCurrency(user.monthlyLimit)}</span>
+        </div>
+    </div>
+
+    <!-- Month Summary -->
+    <div class="month-section">
+        <div class="month-item">
+            <div class="label">Pemasukan Bulan Ini</div>
+            <div class="value" style="color:#166534">${Utils.formatCurrency(monthIncome)}</div>
+        </div>
+        <div class="month-item">
+            <div class="label">Pengeluaran Bulan Ini</div>
+            <div class="value" style="color:#ba1a1a">${Utils.formatCurrency(monthExpense)}</div>
+        </div>
+    </div>
+
+    <!-- Transaction Table -->
+    <div class="table-section">
+        <h3>Riwayat Semua Transaksi (${sorted.length} transaksi)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Catatan</th>
+                    <th>Kategori</th>
+                    <th style="text-align:center">Tipe</th>
+                    <th style="text-align:right">Nominal</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="report-footer">
+        <span>Fintjam &mdash; Laporan Keuangan Personal</span>
+        <span>Digenerate otomatis pada ${tanggalCetak}</span>
+    </div>
+
+    <script>window.onload = () => { window.print(); }<\/script>
+</body>
+</html>`;
+
+            const win = window.open('', '_blank', 'width=900,height=700');
+            win.document.write(html);
+            win.document.close();
+        }
+
+        renderDashboard();
+    </script>
+</body>
+</html>

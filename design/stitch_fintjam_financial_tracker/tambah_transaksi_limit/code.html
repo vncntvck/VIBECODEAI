@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Hanken Grotesk', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "tertiary": "#000000",
+                        "primary-fixed": "#dae2fd",
+                        "on-tertiary-fixed": "#271901",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#0b1c30",
+                        "inverse-primary": "#bec6e0",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "tertiary-fixed": "#fcdeb5",
+                        "on-secondary-fixed": "#00174b",
+                        "on-secondary-container": "#fefcff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "on-background": "#0b1c30",
+                        "primary": "#000000",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#131b2e",
+                        "outline": "#76777d",
+                        "inverse-surface": "#213145",
+                        "secondary-fixed": "#dbe1ff",
+                        "surface": "#f8f9ff",
+                        "secondary-container": "#316bf3",
+                        "surface-variant": "#d3e4fe",
+                        "on-surface-variant": "#45464d",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-container": "#e5eeff",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#98805d",
+                        "on-primary-container": "#7c839b",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary-container": "#271901",
+                        "secondary": "#0051d5",
+                        "on-secondary-fixed-variant": "#003ea8",
+                        "background": "#f8f9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "xs": "4px",
+                        "gutter": "16px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "margin-desktop": "48px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Hanken Grotesk"],
+                        "data-tabular": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-sm": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "label-md": ["Hanken Grotesk"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "data-tabular": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<!-- Top AppBar (From Shared Components JSON) -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-surface-container border-b border-outline-variant">
+<div class="flex justify-between items-center px-gutter h-16 max-w-[1200px] mx-auto">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="account_balance_wallet">account_balance_wallet</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Fintjam</h1>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low transition-colors p-2" data-icon="print">print</span>
+</div>
+</div>
+</header>
+<main class="pt-24 px-gutter max-w-[1200px] mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Limit Reminder Section (The "Modal-like" Inline Section) -->
+<section class="md:col-span-12 lg:col-span-4 order-2 lg:order-1">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-none h-fit">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-secondary" data-icon="notifications_active">notifications_active</span>
+<h2 class="font-headline-sm text-headline-sm">Atur Limit Bulanan</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-lg">
+                        Anda belum menetapkan batas pengeluaran untuk bulan ini. Tetapkan sekarang untuk kontrol finansial yang lebih baik.
+                    </p>
+<form class="space-y-md">
+<div>
+<label class="block font-label-md text-label-md mb-xs text-on-surface">Target Limit (IDR)</label>
+<div class="relative">
+<span class="absolute left-md top-1/2 -translate-y-1/2 font-data-tabular text-outline">Rp</span>
+<input class="w-full pl-12 pr-md py-md bg-white border border-outline-variant focus:border-secondary focus:ring-0 outline-none font-data-tabular text-body-md transition-all" placeholder="0" type="number"/>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-md font-label-md text-label-md hover:opacity-90 active:scale-[0.98] transition-all" type="submit">
+                            Simpan Limit
+                        </button>
+</form>
+<div class="mt-xl pt-lg border-t border-outline-variant">
+<h3 class="font-label-md text-label-md mb-sm">Mengapa pakai limit?</h3>
+<ul class="space-y-xs">
+<li class="flex items-start gap-xs font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] mt-1" data-icon="check_circle">check_circle</span>
+                                Mencegah pengeluaran impulsif.
+                            </li>
+<li class="flex items-start gap-xs font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] mt-1" data-icon="check_circle">check_circle</span>
+                                Memastikan target tabungan tercapai.
+                            </li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Transaction Form Section (The Main Content) -->
+<section class="md:col-span-12 lg:col-span-8 order-1 lg:order-2">
+<div class="bg-white border border-outline-variant p-lg">
+<header class="mb-xl">
+<h2 class="font-headline-md text-headline-md mb-xs">Tambah Transaksi</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Catat setiap arus kas dengan presisi.</p>
+</header>
+<form class="space-y-xl">
+<!-- Type Switcher -->
+<div class="grid grid-cols-2 gap-0 border border-outline-variant">
+<button class="py-md font-label-md text-label-md bg-primary text-on-primary flex items-center justify-center gap-sm" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_downward">arrow_downward</span>
+                                Pengeluaran
+                            </button>
+<button class="py-md font-label-md text-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors flex items-center justify-center gap-sm" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_upward">arrow_upward</span>
+                                Pemasukan
+                            </button>
+</div>
+<!-- Nominal Input -->
+<div class="space-y-xs">
+<label class="block font-label-md text-label-md text-on-surface">Nominal Transaksi</label>
+<div class="relative">
+<span class="absolute left-md top-1/2 -translate-y-1/2 font-headline-sm text-outline">Rp</span>
+<input class="w-full pl-14 pr-md py-lg border-b-2 border-outline focus:border-secondary outline-none font-headline-lg text-headline-lg bg-transparent tracking-tight" type="text" value="0"/>
+</div>
+</div>
+<!-- Category Selector (Bento Style Chips) -->
+<div class="space-y-md">
+<label class="block font-label-md text-label-md text-on-surface">Kategori</label>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-sm">
+<button class="flex flex-col items-center justify-center p-md border border-outline-variant hover:border-secondary hover:bg-secondary/5 transition-all text-on-surface-variant active:scale-95 group" type="button">
+<span class="material-symbols-outlined text-headline-sm mb-xs group-hover:text-secondary" data-icon="restaurant">restaurant</span>
+<span class="font-label-sm text-label-sm">Makanan &amp; Minuman</span>
+</button>
+<button class="flex flex-col items-center justify-center p-md border border-outline-variant hover:border-secondary hover:bg-secondary/5 transition-all text-on-surface-variant active:scale-95 group" type="button">
+<span class="material-symbols-outlined text-headline-sm mb-xs group-hover:text-secondary" data-icon="directions_car">directions_car</span>
+<span class="font-label-sm text-label-sm">Transportasi</span>
+</button>
+<button class="flex flex-col items-center justify-center p-md border border-outline-variant hover:border-secondary hover:bg-secondary/5 transition-all text-on-surface-variant active:scale-95 group" type="button">
+<span class="material-symbols-outlined text-headline-sm mb-xs group-hover:text-secondary" data-icon="shopping_bag">shopping_bag</span>
+<span class="font-label-sm text-label-sm">Belanja</span>
+</button>
+<button class="flex flex-col items-center justify-center p-md border border-outline-variant hover:border-secondary hover:bg-secondary/5 transition-all text-on-surface-variant active:scale-95 group" type="button">
+<span class="material-symbols-outlined text-headline-sm mb-xs group-hover:text-secondary" data-icon="payments">payments</span>
+<span class="font-label-sm text-label-sm">Gaji / Pendapatan</span>
+</button>
+<button class="flex flex-col items-center justify-center p-md border border-outline-variant hover:border-secondary hover:bg-secondary/5 transition-all text-on-surface-variant active:scale-95 group" type="button">
+<span class="material-symbols-outlined text-headline-sm mb-xs group-hover:text-secondary" data-icon="trending_up">trending_up</span>
+<span class="font-label-sm text-label-sm">Investasi</span>
+</button>
+<button class="flex flex-col items-center justify-center p-md border border-outline-variant hover:border-secondary hover:bg-secondary/5 transition-all text-on-surface-variant active:scale-95 group" type="button">
+<span class="material-symbols-outlined text-headline-sm mb-xs group-hover:text-secondary" data-icon="handshake">handshake</span>
+<span class="font-label-sm text-label-sm">Temen Ngutang</span>
+</button>
+</div>
+</div>
+<!-- Date & Notes -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-lg">
+<div class="space-y-xs">
+<label class="block font-label-md text-label-md text-on-surface">Tanggal</label>
+<input class="w-full p-md border border-outline-variant focus:border-secondary outline-none font-body-md text-body-md" type="date"/>
+</div>
+<div class="space-y-xs">
+<label class="block font-label-md text-label-md text-on-surface">Catatan (Opsional)</label>
+<input class="w-full p-md border border-outline-variant focus:border-secondary outline-none font-body-md text-body-md" placeholder="Misal: Makan siang kantor" type="text"/>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="pt-lg flex flex-col sm:flex-row gap-md">
+<button class="flex-1 bg-primary text-on-primary py-lg font-label-md text-label-md hover:bg-opacity-90 transition-all" type="submit">
+                                Simpan Transaksi
+                            </button>
+<button class="px-xl border border-outline text-on-surface-variant py-lg font-label-md text-label-md hover:bg-surface-variant transition-all" type="button">
+                                Batal
+                            </button>
+</div>
+</form>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Navigation (From Shared Components JSON) -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface dark:bg-surface-container border-t border-outline-variant md:hidden">
+<div class="flex justify-around items-center h-16 bg-surface dark:bg-surface-container">
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline cursor-pointer active:scale-95 duration-200 transition-colors">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim font-bold cursor-pointer active:scale-95 duration-200 transition-colors">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-sm text-label-sm">Transaksi</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline cursor-pointer active:scale-95 duration-200 transition-colors">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-sm text-label-sm">Laporan</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline cursor-pointer active:scale-95 duration-200 transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-sm text-label-sm">Setelan</span>
+</div>
+</div>
+</nav>
+<!-- Desktop Sidebar Suggestion (Responsive Implementation) -->
+<div class="hidden md:block fixed left-0 top-16 bottom-0 w-64 bg-surface border-r border-outline-variant">
+<div class="p-md space-y-xs">
+<div class="flex items-center gap-md px-md py-lg text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</div>
+<div class="flex items-center gap-md px-md py-lg bg-surface-container text-secondary font-bold transition-colors cursor-pointer">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-md text-label-md">Transaksi</span>
+</div>
+<div class="flex items-center gap-md px-md py-lg text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</div>
+<div class="flex items-center gap-md px-md py-lg text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Setelan</span>
+</div>
+</div>
+</div>
+</body></html>

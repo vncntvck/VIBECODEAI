@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Set Limit - Fintjam</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#000000",
+                        "secondary": "#0051d5",
+                        "background": "#f8f9ff",
+                        "outline-variant": "#c6c6cd",
+                        "on-surface-variant": "#45464d",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex items-center justify-center p-gutter">
+    <main class="w-full max-w-[500px] flex flex-col gap-xl">
+        <header class="flex flex-col items-center gap-base text-center animate-fade-up">
+            <h1 class="text-2xl font-bold text-primary">Atur Limit Pertama Anda</h1>
+            <p class="text-on-surface-variant">Tentukan batas pengeluaran bulanan Anda untuk mulai memantau keuangan.</p>
+        </header>
+
+        <section class="bg-white border-2 border-black shadow-[4px_4px_0px_#000] p-8 animate-scale-in delay-2">
+            <form id="limit-form" class="flex flex-col gap-6">
+                <div class="flex flex-col gap-2">
+                    <label class="text-sm font-bold text-on-surface-variant" for="limit">Limit Pengeluaran Perbulan (IDR)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-on-surface-variant">Rp</span>
+                        <input class="w-full h-12 pl-12 pr-4 border-2 border-black outline-none focus:border-secondary transition-all font-bold text-lg" 
+                               id="limit" required name="limit" placeholder="Contoh: 5000000" type="number" min="1000"/>
+                    </div>
+                </div>
+                <button class="h-12 w-full bg-black text-white font-bold hover:bg-zinc-800 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" type="submit">
+                    Simpan & Lanjut ke Dashboard
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('limit-form').onsubmit = (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const limit = parseFloat(e.target.limit.value);
+            const user = Storage.getCurrentUser();
+            
+            btn.textContent = 'Menyimpan...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                user.monthlyLimit = limit;
+                Storage.saveUser(user);
+                window.location.href = 'index.html';
+            }, 400);
+        };
+    </script>
+</body>
+</html>

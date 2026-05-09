@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Riwayat Transaksi - Fintjam</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "error": "#ba1a1a",
+                        "primary": "#000000",
+                        "secondary": "#0051d5",
+                        "background": "#f8f9ff",
+                        "surface": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "on-surface-variant": "#45464d",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 bg-white border-b-2 border-black h-16">
+        <div class="flex justify-between items-center px-4 h-full max-w-[1200px] mx-auto">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined text-black text-3xl">account_balance_wallet</span>
+                <h1 class="text-xl font-bold text-black">Fintjam</h1>
+            </div>
+            <span class="text-sm font-bold text-gray-500" id="tx-count">0 transaksi</span>
+        </div>
+    </header>
+
+    <main class="pt-24 px-4 max-w-[1200px] mx-auto space-y-6">
+
+        <!-- Page Title + Filter Bar -->
+        <div class="animate-fade-up">
+            <h2 class="text-2xl font-black mb-4">Riwayat Transaksi</h2>
+
+            <!-- Filter & Search -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <!-- Search -->
+                <div class="relative flex-1">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[20px]">search</span>
+                    <input id="search-input" type="text" placeholder="Cari catatan atau kategori..."
+                        class="w-full h-11 pl-10 pr-4 border-2 border-black outline-none focus:border-secondary font-bold text-sm transition-all"/>
+                </div>
+                <!-- Filter Tipe -->
+                <select id="filter-type" class="h-11 px-4 border-2 border-black outline-none font-bold text-sm bg-white cursor-pointer focus:border-secondary transition-all">
+                    <option value="all">Semua Tipe</option>
+                    <option value="income">Pemasukan</option>
+                    <option value="expense">Pengeluaran</option>
+                </select>
+                <!-- Filter Bulan -->
+                <select id="filter-month" class="h-11 px-4 border-2 border-black outline-none font-bold text-sm bg-white cursor-pointer focus:border-secondary transition-all">
+                    <option value="all">Semua Bulan</option>
+                </select>
+                <!-- Sort -->
+                <select id="sort-order" class="h-11 px-4 border-2 border-black outline-none font-bold text-sm bg-white cursor-pointer focus:border-secondary transition-all">
+                    <option value="newest">Terbaru</option>
+                    <option value="oldest">Terlama</option>
+                    <option value="highest">Nominal Terbesar</option>
+                    <option value="lowest">Nominal Terkecil</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Summary Strip -->
+        <div class="grid grid-cols-3 gap-4 animate-fade-up delay-1">
+            <div class="bg-white border-2 border-black shadow-[3px_3px_0px_#000] p-4">
+                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Pemasukan</p>
+                <p id="sum-income" class="text-lg font-black text-success">Rp 0</p>
+            </div>
+            <div class="bg-white border-2 border-black shadow-[3px_3px_0px_#000] p-4">
+                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Pengeluaran</p>
+                <p id="sum-expense" class="text-lg font-black text-error">Rp 0</p>
+            </div>
+            <div class="bg-white border-2 border-black shadow-[3px_3px_0px_#000] p-4">
+                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Selisih</p>
+                <p id="sum-delta" class="text-lg font-black">Rp 0</p>
+            </div>
+        </div>
+
+        <!-- Transaction List -->
+        <div class="bg-white border-2 border-black shadow-[4px_4px_0px_#000] overflow-hidden animate-fade-up delay-2">
+            <div id="tx-list" class="divide-y-2 divide-black">
+                <!-- Injected by JS -->
+            </div>
+            <!-- Empty state -->
+            <div id="tx-empty" class="hidden p-12 text-center">
+                <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">receipt_long</span>
+                <p class="font-bold text-gray-400">Tidak ada transaksi ditemukan.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FAB tambah transaksi -->
+    <div class="fixed bottom-24 right-4 z-40">
+        <a href="transactions.html" class="w-14 h-14 bg-black text-white flex items-center justify-center border-2 border-black shadow-[4px_4px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all fab-pulse">
+            <span class="material-symbols-outlined text-2xl">add</span>
+        </a>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 w-full z-50 border-t-2 border-black bg-white">
+        <div class="flex justify-around items-center h-16 max-w-[1200px] mx-auto">
+            <a href="index.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black transition-colors">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-xs">Dashboard</span>
+            </a>
+            <a href="transactions.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black transition-colors">
+                <span class="material-symbols-outlined">add_circle</span>
+                <span class="text-xs">Transaksi</span>
+            </a>
+            <a href="riwayat.html" class="flex flex-col items-center justify-center text-secondary font-bold">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+                <span class="text-xs">Riwayat</span>
+            </a>
+            <a href="settings.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black transition-colors">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="text-xs">Setelan</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        const user = Storage.getCurrentUser();
+        let allTransactions = Storage.getTransactions(user.id);
+
+        const CATEGORY_ICONS = {
+            'Makanan & Minuman': 'restaurant',
+            'Transportasi':      'directions_car',
+            'Belanja':           'shopping_bag',
+            'Temen Ngutang':     'handshake',
+            'Gaji / Pendapatan': 'payments',
+            'Investasi':         'trending_up',
+        };
+
+        // Populate month filter
+        const monthSet = new Set();
+        allTransactions.forEach(t => {
+            const d = new Date(t.date);
+            monthSet.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+        });
+        const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        const monthSelect = document.getElementById('filter-month');
+        [...monthSet].sort().reverse().forEach(ym => {
+            const [y, m] = ym.split('-');
+            const opt = document.createElement('option');
+            opt.value = ym;
+            opt.textContent = `${MONTHS_ID[parseInt(m)-1]} ${y}`;
+            monthSelect.appendChild(opt);
+        });
+
+        function getFiltered() {
+            const q     = document.getElementById('search-input').value.toLowerCase();
+            const type  = document.getElementById('filter-type').value;
+            const month = document.getElementById('filter-month').value;
+            const sort  = document.getElementById('sort-order').value;
+
+            let list = [...allTransactions];
+
+            if (type  !== 'all') list = list.filter(t => t.type === type);
+            if (month !== 'all') list = list.filter(t => {
+                const d = new Date(t.date);
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` === month;
+            });
+            if (q) list = list.filter(t =>
+                (t.note || '').toLowerCase().includes(q) ||
+                t.category.toLowerCase().includes(q)
+            );
+
+            list.sort((a, b) => {
+                if (sort === 'newest')  return new Date(b.date) - new Date(a.date);
+                if (sort === 'oldest')  return new Date(a.date) - new Date(b.date);
+                if (sort === 'highest') return b.amount - a.amount;
+                if (sort === 'lowest')  return a.amount - b.amount;
+            });
+
+            return list;
+        }
+
+        function render() {
+            const list = getFiltered();
+            const txList  = document.getElementById('tx-list');
+            const txEmpty = document.getElementById('tx-empty');
+
+            // Summary strip
+            const inc = list.filter(t => t.type === 'income').reduce((s,t) => s+t.amount, 0);
+            const exp = list.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0);
+            const delta = inc - exp;
+            document.getElementById('sum-income').textContent  = Utils.formatCurrency(inc);
+            document.getElementById('sum-expense').textContent = Utils.formatCurrency(exp);
+            const deltaEl = document.getElementById('sum-delta');
+            deltaEl.textContent = (delta >= 0 ? '+' : '') + Utils.formatCurrency(delta);
+            deltaEl.className = `text-lg font-black ${delta >= 0 ? 'text-success' : 'text-error'}`;
+            document.getElementById('tx-count').textContent = `${list.length} transaksi`;
+
+            if (list.length === 0) {
+                txList.innerHTML = '';
+                txEmpty.classList.remove('hidden');
+                return;
+            }
+            txEmpty.classList.add('hidden');
+
+            // Group by date
+            const groups = {};
+            list.forEach(t => {
+                const key = t.date;
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(t);
+            });
+
+            const sortedDates = Object.keys(groups).sort((a,b) => {
+                const sort = document.getElementById('sort-order').value;
+                if (sort === 'oldest') return new Date(a) - new Date(b);
+                return new Date(b) - new Date(a);
+            });
+
+            txList.innerHTML = sortedDates.map(date => {
+                const dayTx = groups[date];
+                const dayInc = dayTx.filter(t => t.type === 'income').reduce((s,t) => s+t.amount, 0);
+                const dayExp = dayTx.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0);
+                const dateLabel = new Date(date).toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+                const rows = dayTx.map(t => {
+                    const icon = CATEGORY_ICONS[t.category] || (t.type === 'income' ? 'payments' : 'shopping_bag');
+                    return `
+                    <div class="px-5 py-4 flex items-center justify-between hover:bg-zinc-50 transition-colors tx-row group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center border-2 border-black bg-zinc-100 flex-shrink-0">
+                                <span class="material-symbols-outlined text-black text-[20px]">${icon}</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm leading-tight">${t.note || t.category}</p>
+                                <div class="flex gap-2 items-center mt-0.5">
+                                    <span class="px-2 py-0.5 bg-zinc-200 border border-black text-[10px] font-bold uppercase">${t.category}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="font-black text-sm ${t.type === 'income' ? 'text-success' : 'text-error'} flex-shrink-0 ml-4">
+                            ${t.type === 'income' ? '+' : '-'}${Utils.formatCurrency(t.amount)}
+                        </p>
+                    </div>`;
+                }).join('');
+
+                return `
+                <div>
+                    <!-- Date header -->
+                    <div class="px-5 py-2 bg-zinc-100 border-b-2 border-black flex justify-between items-center">
+                        <span class="text-xs font-black uppercase tracking-widest text-gray-600">${dateLabel}</span>
+                        <span class="text-xs font-bold ${dayInc - dayExp >= 0 ? 'text-success' : 'text-error'}">
+                            ${dayInc > 0 ? `+${Utils.formatCurrency(dayInc)} ` : ''}${dayExp > 0 ? `-${Utils.formatCurrency(dayExp)}` : ''}
+                        </span>
+                    </div>
+                    ${rows}
+                </div>`;
+            }).join('');
+        }
+
+        // Event listeners
+        ['search-input','filter-type','filter-month','sort-order'].forEach(id => {
+            document.getElementById(id).addEventListener('input', render);
+            document.getElementById(id).addEventListener('change', render);
+        });
+
+        render();
+    </script>
+</body>
+</html>

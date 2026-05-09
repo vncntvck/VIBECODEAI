@@ -1,0 +1,258 @@
+<!doctype html>
+<html class="light" lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Masuk - Fintjam</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              error: "#ba1a1a",
+              "on-primary": "#ffffff",
+              primary: "#000000",
+              secondary: "#0051d5",
+              background: "#f8f9ff",
+              surface: "#ffffff",
+              "outline-variant": "#c6c6cd",
+              "on-surface-variant": "#45464d",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="bg-background text-on-background min-h-screen flex items-center justify-center p-gutter"
+  >
+    <main class="w-full max-w-[400px] flex flex-col gap-xl">
+      <!-- Brand Header -->
+      <header class="flex flex-col items-center gap-base text-center animate-fade-up">
+        <div class="flex items-center gap-sm mb-sm">
+          <span
+            class="material-symbols-outlined text-primary text-[32px]"
+            data-icon="account_balance_wallet"
+            style="transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1)"
+            onmouseover="this.style.transform='rotate(-10deg) scale(1.2)'"
+            onmouseout="this.style.transform=''"
+            >account_balance_wallet</span
+          >
+          <h1 class="font-bold text-2xl text-primary">Fintjam</h1>
+        </div>
+        <p class="text-on-surface-variant">
+          Solusi manajemen keuangan personal yang presisi.
+        </p>
+      </header>
+
+      <!-- Auth Container (Login View) -->
+      <section
+        class="bg-white border-2 border-black shadow-[4px_4px_0px_#000] p-8 flex flex-col gap-6 animate-scale-in delay-1"
+        id="login-section"
+      >
+        <div class="flex flex-col gap-1">
+          <h2 class="text-xl font-bold">Masuk ke Akun</h2>
+          <p class="text-sm text-on-surface-variant">
+            Kelola transaksi dan laporan Rp Anda.
+          </p>
+        </div>
+        <form id="login-form" class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-bold" for="login-username"
+              >Nama Pengguna</label
+            >
+            <input
+              class="w-full h-12 px-4 border-2 border-black outline-none focus:border-secondary transition-all"
+              id="login-username"
+              required
+              name="username"
+              placeholder="Username"
+              type="text"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-bold" for="login-password"
+              >Kata Sandi</label
+            >
+            <input
+              class="w-full h-12 px-4 border-2 border-black outline-none focus:border-secondary transition-all"
+              id="login-password"
+              required
+              name="password"
+              placeholder="••••••••"
+              type="password"
+            />
+          </div>
+          <button
+            class="h-12 w-full bg-black text-white font-bold hover:bg-zinc-800 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all mt-2"
+            type="submit"
+          >
+            Masuk Sekarang
+          </button>
+        </form>
+        <div class="pt-4 border-t border-outline-variant text-center">
+          <p class="text-sm">
+            Belum punya akun?
+            <button
+              class="text-secondary font-bold hover:underline"
+              onclick="toggleAuth('register')"
+            >
+              Daftar Baru
+            </button>
+          </p>
+        </div>
+      </section>
+
+      <!-- Auth Container (Register View) -->
+      <section
+        class="hidden bg-white border-2 border-black shadow-[4px_4px_0px_#000] p-8 flex flex-col gap-6"
+        id="register-section"
+      >
+        <div class="flex flex-col gap-1">
+          <h2 class="text-xl font-bold">Pendaftaran Baru</h2>
+          <p class="text-sm text-on-surface-variant">
+            Mulai pantau arus kas Anda.
+          </p>
+        </div>
+        <form id="register-form" class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-bold" for="reg-username"
+              >Nama Pengguna</label
+            >
+            <input
+              class="w-full h-12 px-4 border-2 border-black outline-none focus:border-secondary transition-all"
+              id="reg-username"
+              required
+              name="username"
+              placeholder="Username unik"
+              type="text"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-bold" for="reg-password"
+              >Kata Sandi</label
+            >
+            <input
+              class="w-full h-12 px-4 border-2 border-black outline-none focus:border-secondary transition-all"
+              id="reg-password"
+              required
+              name="password"
+              placeholder="Minimal 8 karakter"
+              type="password"
+            />
+          </div>
+          <button
+            class="h-12 w-full bg-black text-white font-bold hover:bg-zinc-800 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all mt-2"
+            type="submit"
+          >
+            Buat Akun
+          </button>
+        </form>
+        <div class="pt-4 border-t border-outline-variant text-center">
+          <p class="text-sm">
+            Sudah memiliki akun?
+            <button
+              class="text-secondary font-bold hover:underline"
+              onclick="toggleAuth('login')"
+            >
+              Masuk Disini
+            </button>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Toast helper
+      function showToast(msg, isError = false) {
+        let t = document.getElementById('_toast');
+        if (!t) {
+          t = document.createElement('div');
+          t.id = '_toast';
+          t.className = 'toast';
+          document.body.appendChild(t);
+        }
+        t.textContent = msg;
+        t.style.background = isError ? '#ba1a1a' : '#000';
+        t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+      }
+
+      function toggleAuth(view) {
+        document
+          .getElementById("login-section")
+          .classList.toggle("hidden", view === "register");
+        document
+          .getElementById("register-section")
+          .classList.toggle("hidden", view === "login");
+        // Re-trigger scale animation
+        const active = view === 'login' ? 'login-section' : 'register-section';
+        const el = document.getElementById(active);
+        el.style.animation = 'none';
+        el.offsetHeight; // reflow
+        el.style.animation = '';
+      }
+
+      document.getElementById("register-form").onsubmit = (e) => {
+        e.preventDefault();
+        const username = e.target.username.value;
+        const password = e.target.password.value;
+
+        const users = Storage.getUsers();
+        if (users.find((u) => u.username === username)) {
+          showToast("Username sudah digunakan!", true);
+          return;
+        }
+
+        const newUser = {
+          id: crypto.randomUUID(),
+          username,
+          password,
+          monthlyLimit: 0,
+        };
+        Storage.saveUser(newUser);
+        showToast("Pendaftaran berhasil! Silakan masuk.");
+        setTimeout(() => toggleAuth("login"), 1200);
+      };
+
+      document.getElementById("login-form").onsubmit = (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const username = e.target.username.value;
+        const password = e.target.password.value;
+
+        btn.textContent = 'Memproses...';
+        btn.disabled = true;
+
+        setTimeout(() => {
+          const user = Storage.getUsers().find(
+            (u) => u.username === username && u.password === password,
+          );
+          if (user) {
+            Storage.setCurrentUser(user.id);
+            window.location.href =
+              user.monthlyLimit > 0 ? "index.html" : "limit-setup.html";
+          } else {
+            showToast("Username atau password salah!", true);
+            btn.textContent = 'Masuk Sekarang';
+            btn.disabled = false;
+          }
+        }, 400);
+      };
+    </script>
+  </body>
+</html>
