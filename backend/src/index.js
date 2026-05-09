@@ -13,6 +13,9 @@ const userRoutes    = require('./routes/user');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust Railway reverse proxy
+app.set('trust proxy', 1);
+
 // ── Middleware ──────────────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,8 +33,8 @@ app.use(session({
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: true,
+    sameSite: 'none',
   },
 }));
 
