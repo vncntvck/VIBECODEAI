@@ -6,7 +6,7 @@ const { requireAuth } = require('../middleware/auth');
 // PUT /api/user/profile — update username, password, limit
 router.put('/profile', requireAuth, async (req, res) => {
   const { username, password, monthlyLimit } = req.body;
-  const userId = req.session.userId;
+  const userId = req.userId;
 
   try {
     // Cek username tidak bentrok dengan user lain

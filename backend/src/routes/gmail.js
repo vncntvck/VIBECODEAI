@@ -19,7 +19,7 @@ router.get('/connect', requireAuth, (req, res) => {
     access_type: 'offline',
     prompt: 'consent',
     scope: ['https://www.googleapis.com/auth/gmail.readonly'],
-    state: req.session.userId.toString(),
+    state: req.userId.toString(),
   });
   res.json({ url });
 });
@@ -58,20 +58,20 @@ router.get('/callback', async (req, res) => {
 router.get('/status', requireAuth, async (req, res) => {
   const result = await pool.query(
     'SELECT user_id, updated_at FROM gmail_tokens WHERE user_id = $1',
-    [req.session.userId]
+    [req.userId]
   );
   res.json({ connected: result.rows.length > 0, updatedAt: result.rows[0]?.updated_at });
 });
 
 // DELETE /api/gmail/disconnect — cabut koneksi Gmail
 router.delete('/disconnect', requireAuth, async (req, res) => {
-  await pool.query('DELETE FROM gmail_tokens WHERE user_id = $1', [req.session.userId]);
+  await pool.query('DELETE FROM gmail_tokens WHERE user_id = $1', [req.userId]);
   res.json({ ok: true });
 });
 
 // POST /api/gmail/sync — tarik email bank & parse jadi transaksi
 router.post('/sync', requireAuth, async (req, res) => {
-  const userId = req.session.userId;
+  const userId = req.userId;
 
   try {
     // Ambil token dari DB
