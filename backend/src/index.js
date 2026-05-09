@@ -1,14 +1,12 @@
 require('dotenv').config();
-const express    = require('express');
-const session    = require('express-session');
-const pgSession  = require('connect-pg-simple')(session);
-const cors       = require('cors');
+const express  = require('express');
+const cors     = require('cors');
 const { pool, initDB } = require('./db');
 
-const authRoutes    = require('./routes/auth');
-const txRoutes      = require('./routes/transactions');
-const gmailRoutes   = require('./routes/gmail');
-const userRoutes    = require('./routes/user');
+const authRoutes  = require('./routes/auth');
+const txRoutes    = require('./routes/transactions');
+const gmailRoutes = require('./routes/gmail');
+const userRoutes  = require('./routes/user');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -20,23 +18,8 @@ app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5500',
-  credentials: false,
-}));
-
-app.use(session({
-  store: new pgSession({ pool, tableName: 'user_sessions' }),
-  secret: process.env.SESSION_SECRET || 'dev_secret_change_me',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-  },
-}));
+// CORS — allow semua origin (JWT auth, tidak butuh credentials)
+app.use(cors());
 
 // ── Routes ──────────────────────────────────────────────────
 app.use('/api/auth',         authRoutes);
