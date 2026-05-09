@@ -62,7 +62,7 @@
                 <label class="text-sm font-bold text-zinc-500" for="limit">Limit Pengeluaran Bulanan (IDR)</label>
                 <div class="relative">
                     <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-zinc-400">Rp</span>
-                    <input class="w-full h-12 pl-12 pr-4 border-2 border-black focus:border-secondary outline-none transition-all font-bold" id="limit" type="number" required/>
+                    <input class="w-full h-12 pl-12 pr-4 border-2 border-black focus:border-secondary outline-none transition-all font-bold" id="limit" type="text" inputmode="numeric" autocomplete="off" required/>
                 </div>
             </div>
 
@@ -117,16 +117,33 @@
             t._timer = setTimeout(() => t.classList.remove('show'), 2800);
         }
 
+        function formatRibuan(n) {
+            const num = parseInt(String(n).replace(/\D/g, ''), 10);
+            if (isNaN(num) || num === 0) return '';
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
         // Initial values
         document.getElementById('username').value = user.username;
-        document.getElementById('limit').value = user.monthlyLimit;
+        document.getElementById('limit').value = formatRibuan(user.monthlyLimit);
+
+        // Format titik ribuan saat mengetik
+        const limitInput = document.getElementById('limit');
+        limitInput.addEventListener('input', () => {
+            const digits = limitInput.value.replace(/\D/g, '');
+            limitInput.value = digits ? formatRibuan(digits) : '';
+        });
+        limitInput.addEventListener('keydown', (e) => {
+            const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
+            if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) e.preventDefault();
+        });
 
         document.getElementById('settings-form').onsubmit = (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
             const newUsername = document.getElementById('username').value;
             const newPassword = document.getElementById('password').value;
-            const newLimit = parseFloat(document.getElementById('limit').value);
+            const newLimit = parseInt(document.getElementById('limit').value.replace(/\./g, ''), 10);
             
             btn.textContent = 'Menyimpan...';
             btn.disabled = true;

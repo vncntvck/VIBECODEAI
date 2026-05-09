@@ -160,16 +160,13 @@
         // ── Format angka dengan titik ribuan saat mengetik ──
         const amountInput = document.getElementById('amount-input');
 
+        function formatRibuan(n) {
+            return n ? String(parseInt(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
+        }
+
         amountInput.addEventListener('input', () => {
-            // Ambil hanya digit
             const digits = amountInput.value.replace(/\D/g, '');
-            if (digits === '') {
-                amountInput.value = '';
-                return;
-            }
-            // Format dengan titik ribuan (id-ID pakai titik sebagai separator ribuan)
-            const formatted = parseInt(digits, 10).toLocaleString('id-ID');
-            amountInput.value = formatted;
+            amountInput.value = digits ? formatRibuan(digits) : '';
         });
 
         // Blok karakter non-angka (kecuali backspace, delete, arrow, dll)
