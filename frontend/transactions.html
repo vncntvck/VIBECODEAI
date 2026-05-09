@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Transaksi - Fintjam</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script>window.FINTJAM_API_URL = '';</script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: {
+            "primary": "#000000", "secondary": "#0051d5",
+            "background": "#f8f9ff", "outline-variant": "#c6c6cd",
+        }}}}
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+    <header class="fixed top-0 w-full z-50 bg-white border-b-2 border-black h-16">
+        <div class="flex justify-between items-center px-4 h-full max-w-[1200px] mx-auto">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined text-black text-3xl">account_balance_wallet</span>
+                <h1 class="text-xl font-bold text-black">Fintjam</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24 px-4 max-w-[1200px] mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <section class="lg:col-span-12 animate-fade-up delay-1">
+                <div class="bg-white border-2 border-black shadow-[4px_4px_0px_#000] p-8">
+                    <h2 class="text-2xl font-bold mb-6">Tambah Transaksi</h2>
+                    <form id="transaction-form" class="space-y-8">
+                        <div class="grid grid-cols-2 border-2 border-black">
+                            <button id="btn-expense" class="py-4 font-bold bg-black text-white flex items-center justify-center gap-2" type="button" onclick="setType('expense')">
+                                <span class="material-symbols-outlined">arrow_downward</span>Pengeluaran
+                            </button>
+                            <button id="btn-income" class="py-4 font-bold bg-zinc-100 flex items-center justify-center gap-2" type="button" onclick="setType('income')">
+                                <span class="material-symbols-outlined">arrow_upward</span>Pemasukan
+                            </button>
+                            <input type="hidden" name="type" id="type-input" value="expense">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="font-bold">Nominal Transaksi</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-zinc-400">Rp</span>
+                                <input id="amount-input" class="w-full pl-16 pr-4 py-6 border-b-4 border-black focus:border-secondary outline-none text-4xl font-bold bg-transparent"
+                                       required name="amount" type="text" inputmode="numeric" placeholder="0" autocomplete="off"/>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <label class="font-bold">Kategori</label>
+                            <div id="category-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
+                            <input type="hidden" name="category" id="category-input" required>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-1">
+                                <label class="font-bold">Tanggal</label>
+                                <input class="w-full h-12 px-4 border-2 border-black outline-none focus:border-secondary font-bold"
+                                       required name="date" type="date" id="date-input"/>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="font-bold">Catatan (Opsional)</label>
+                                <input class="w-full h-12 px-4 border-2 border-black outline-none focus:border-secondary font-bold"
+                                       name="note" type="text" placeholder="Misal: Makan siang kantor"/>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 flex gap-4">
+                            <button class="flex-1 h-14 bg-black text-white font-bold border-2 border-black shadow-[4px_4px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" type="submit">
+                                Simpan Transaksi
+                            </button>
+                            <a href="index.html" class="flex items-center justify-center px-8 border-2 border-black font-bold hover:bg-zinc-100 transition-all">Batal</a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 w-full z-50 border-t-2 border-black bg-white">
+        <div class="flex justify-around items-center h-16 max-w-[1200px] mx-auto">
+            <a href="index.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+                <span class="material-symbols-outlined">dashboard</span><span class="text-xs">Dashboard</span>
+            </a>
+            <a href="transactions.html" class="flex flex-col items-center justify-center text-secondary font-bold">
+                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">add_circle</span><span class="text-xs">Transaksi</span>
+            </a>
+            <a href="riwayat.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+                <span class="material-symbols-outlined">receipt_long</span><span class="text-xs">Riwayat</span>
+            </a>
+            <a href="settings.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+                <span class="material-symbols-outlined">settings</span><span class="text-xs">Setelan</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        function showToast(msg, isError = false) {
+            let t = document.getElementById('_toast');
+            if (!t) { t = document.createElement('div'); t.id = '_toast'; t.className = 'toast'; document.body.appendChild(t); }
+            t.textContent = msg; t.style.background = isError ? '#ba1a1a' : '#000';
+            t.classList.add('show'); clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        requireLogin();
+
+        const categories = {
+            expense: [
+                { name: 'Makanan & Minuman', icon: 'restaurant' },
+                { name: 'Transportasi', icon: 'directions_car' },
+                { name: 'Belanja', icon: 'shopping_bag' },
+                { name: 'Temen Ngutang', icon: 'handshake' }
+            ],
+            income: [
+                { name: 'Gaji / Pendapatan', icon: 'payments' },
+                { name: 'Investasi', icon: 'trending_up' }
+            ]
+        };
+
+        let currentType = 'expense';
+        document.getElementById('date-input').valueAsDate = new Date();
+
+        function formatRibuan(n) {
+            const num = parseInt(String(n).replace(/\D/g, ''), 10);
+            return isNaN(num) ? '' : num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        const amountInput = document.getElementById('amount-input');
+        amountInput.addEventListener('input', () => {
+            const d = amountInput.value.replace(/\D/g, '');
+            amountInput.value = d ? formatRibuan(d) : '';
+        });
+        amountInput.addEventListener('keydown', (e) => {
+            const ok = ['Backspace','Delete','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Tab','Home','End'];
+            if (!ok.includes(e.key) && !/^\d$/.test(e.key)) e.preventDefault();
+        });
+
+        function setType(type) {
+            currentType = type;
+            document.getElementById('type-input').value = type;
+            document.getElementById('btn-expense').className = `py-4 font-bold flex items-center justify-center gap-2 ${type==='expense' ? 'bg-black text-white' : 'bg-zinc-100'}`;
+            document.getElementById('btn-income').className  = `py-4 font-bold flex items-center justify-center gap-2 ${type==='income'  ? 'bg-black text-white' : 'bg-zinc-100'}`;
+            renderCategories();
+        }
+
+        function renderCategories() {
+            document.getElementById('category-grid').innerHTML = categories[currentType].map(c => `
+                <button type="button" onclick="setCategory('${c.name}')" class="category-btn flex flex-col items-center justify-center p-6 border-2 border-black hover:border-secondary hover:bg-secondary/5 transition-all group" data-name="${c.name}">
+                    <span class="material-symbols-outlined text-3xl mb-2 group-hover:text-secondary">${c.icon}</span>
+                    <span class="text-xs font-bold text-center">${c.name}</span>
+                </button>`).join('');
+            document.getElementById('category-input').value = '';
+        }
+
+        function setCategory(name) {
+            document.getElementById('category-input').value = name;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('bg-secondary/10', btn.dataset.name === name);
+                btn.classList.toggle('border-secondary', btn.dataset.name === name);
+            });
+        }
+
+        document.getElementById('transaction-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const category = document.getElementById('category-input').value;
+            if (!category) { showToast('Pilih kategori terlebih dahulu!', true); return; }
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.textContent = 'Menyimpan...'; btn.disabled = true;
+
+            try {
+                await Api.transactions.create({
+                    type:     document.getElementById('type-input').value,
+                    amount:   parseInt(amountInput.value.replace(/\./g, ''), 10),
+                    category,
+                    date:     document.getElementById('date-input').value,
+                    note:     e.target.note.value,
+                });
+                window.location.href = 'index.html';
+            } catch (err) {
+                showToast(err.message, true);
+                btn.textContent = 'Simpan Transaksi'; btn.disabled = false;
+            }
+        };
+
+        setType('expense');
+    </script>
+</body>
+</html>

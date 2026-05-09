@@ -1,0 +1,147 @@
+<!doctype html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Masuk - Fintjam</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+  <!-- API URL — ganti saat deploy -->
+  <script>window.FINTJAM_API_URL = '';</script>
+  <script src="assets/js/api.js"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: {
+        error: '#ba1a1a', primary: '#000000', secondary: '#0051d5',
+        background: '#f8f9ff', surface: '#ffffff',
+        'outline-variant': '#c6c6cd', 'on-surface-variant': '#45464d',
+      }}}
+    }
+  </script>
+</head>
+<body class="bg-background min-h-screen flex items-center justify-center p-4">
+  <main class="w-full max-w-[400px] flex flex-col gap-8">
+
+    <header class="flex flex-col items-center gap-3 text-center animate-fade-up">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-[32px]">account_balance_wallet</span>
+        <h1 class="font-bold text-2xl">Fintjam</h1>
+      </div>
+      <p class="text-on-surface-variant text-sm">Solusi manajemen keuangan personal yang presisi.</p>
+    </header>
+
+    <!-- Login -->
+    <section id="login-section" class="bg-white border-2 border-black shadow-[4px_4px_0px_#000] p-8 flex flex-col gap-6 animate-scale-in delay-1">
+      <div>
+        <h2 class="text-xl font-bold">Masuk ke Akun</h2>
+        <p class="text-sm text-on-surface-variant mt-1">Kelola transaksi dan laporan Anda.</p>
+      </div>
+      <form id="login-form" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-bold" for="login-username">Nama Pengguna</label>
+          <input class="w-full h-12 px-4 border-2 border-black outline-none focus:border-secondary transition-all font-bold"
+                 id="login-username" required placeholder="Username" type="text"/>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-bold" for="login-password">Kata Sandi</label>
+          <input class="w-full h-12 px-4 border-2 border-black outline-none focus:border-secondary transition-all font-bold"
+                 id="login-password" required placeholder="••••••••" type="password"/>
+        </div>
+        <button class="h-12 w-full bg-black text-white font-bold hover:bg-zinc-800 active:translate-x-[2px] active:translate-y-[2px] transition-all mt-2" type="submit">
+          Masuk Sekarang
+        </button>
+      </form>
+      <div class="pt-4 border-t border-outline-variant text-center text-sm">
+        Belum punya akun?
+        <button class="text-secondary font-bold hover:underline" onclick="toggleAuth('register')">Daftar Baru</button>
+      </div>
+    </section>
+
+    <!-- Register -->
+    <section id="register-section" class="hidden bg-white border-2 border-black shadow-[4px_4px_0px_#000] p-8 flex flex-col gap-6">
+      <div>
+        <h2 class="text-xl font-bold">Pendaftaran Baru</h2>
+        <p class="text-sm text-on-surface-variant mt-1">Mulai pantau arus kas Anda.</p>
+      </div>
+      <form id="register-form" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-bold" for="reg-username">Nama Pengguna</label>
+          <input class="w-full h-12 px-4 border-2 border-black outline-none focus:border-secondary transition-all font-bold"
+                 id="reg-username" required placeholder="Username unik" type="text"/>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-bold" for="reg-password">Kata Sandi</label>
+          <input class="w-full h-12 px-4 border-2 border-black outline-none focus:border-secondary transition-all font-bold"
+                 id="reg-password" required placeholder="Minimal 6 karakter" type="password"/>
+        </div>
+        <button class="h-12 w-full bg-black text-white font-bold hover:bg-zinc-800 active:translate-x-[2px] active:translate-y-[2px] transition-all mt-2" type="submit">
+          Buat Akun
+        </button>
+      </form>
+      <div class="pt-4 border-t border-outline-variant text-center text-sm">
+        Sudah memiliki akun?
+        <button class="text-secondary font-bold hover:underline" onclick="toggleAuth('login')">Masuk Disini</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Cek kalau sudah login
+    Api.auth.me().then(({ user }) => {
+      window.location.href = user.monthlyLimit > 0 ? 'index.html' : 'limit-setup.html';
+    }).catch(() => {});
+
+    function showToast(msg, isError = false) {
+      let t = document.getElementById('_toast');
+      if (!t) { t = document.createElement('div'); t.id = '_toast'; t.className = 'toast'; document.body.appendChild(t); }
+      t.textContent = msg;
+      t.style.background = isError ? '#ba1a1a' : '#000';
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    function toggleAuth(view) {
+      document.getElementById('login-section').classList.toggle('hidden', view === 'register');
+      document.getElementById('register-section').classList.toggle('hidden', view === 'login');
+    }
+
+    document.getElementById('register-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.textContent = 'Mendaftar...'; btn.disabled = true;
+      try {
+        await Api.auth.register(
+          document.getElementById('reg-username').value,
+          document.getElementById('reg-password').value
+        );
+        showToast('Pendaftaran berhasil! Silakan atur limit.');
+        setTimeout(() => window.location.href = 'limit-setup.html', 800);
+      } catch (err) {
+        showToast(err.message, true);
+        btn.textContent = 'Buat Akun'; btn.disabled = false;
+      }
+    };
+
+    document.getElementById('login-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.textContent = 'Memproses...'; btn.disabled = true;
+      try {
+        const { user } = await Api.auth.login(
+          document.getElementById('login-username').value,
+          document.getElementById('login-password').value
+        );
+        window.location.href = user.monthlyLimit > 0 ? 'index.html' : 'limit-setup.html';
+      } catch (err) {
+        showToast(err.message, true);
+        btn.textContent = 'Masuk Sekarang'; btn.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Setelan - Fintjam</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script>window.FINTJAM_API_URL = '';</script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: {
+            "primary": "#000000", "secondary": "#0051d5",
+            "background": "#f8f9ff", "error": "#ba1a1a",
+        }}}}
+    </script>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-24">
+    <header class="fixed top-0 w-full z-50 bg-white border-b-2 border-black h-16">
+        <div class="flex justify-between items-center px-4 h-full max-w-[1200px] mx-auto">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined text-black text-3xl">account_balance_wallet</span>
+                <h1 class="text-xl font-bold text-black">Fintjam</h1>
+            </div>
+            <button id="btn-logout" class="text-error font-bold flex items-center gap-2 hover:underline">
+                <span class="material-symbols-outlined">logout</span>Keluar
+            </button>
+        </div>
+    </header>
+
+    <main class="pt-24 px-4 max-w-[600px] mx-auto">
+        <section class="mb-8 animate-fade-up">
+            <h2 class="text-2xl font-bold mb-2">Setelan Akun</h2>
+            <p class="text-zinc-500">Kelola profil dan batasan keuangan Anda.</p>
+        </section>
+
+        <form id="settings-form" class="space-y-6 animate-fade-up delay-1">
+            <div class="space-y-1">
+                <label class="text-sm font-bold text-zinc-500" for="username">Nama Pengguna</label>
+                <input class="w-full h-12 px-4 border-2 border-black focus:border-secondary outline-none transition-all font-bold" id="username" type="text" required/>
+            </div>
+            <div class="space-y-1">
+                <label class="text-sm font-bold text-zinc-500" for="password">Kata Sandi Baru</label>
+                <input class="w-full h-12 px-4 border-2 border-black focus:border-secondary outline-none transition-all font-bold" id="password" type="password" placeholder="••••••••"/>
+                <p class="text-xs text-zinc-400">Biarkan kosong jika tidak ingin mengubah.</p>
+            </div>
+            <div class="space-y-1">
+                <label class="text-sm font-bold text-zinc-500" for="limit">Limit Pengeluaran Bulanan (IDR)</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-zinc-400">Rp</span>
+                    <input class="w-full h-12 pl-12 pr-4 border-2 border-black focus:border-secondary outline-none transition-all font-bold" id="limit" type="text" inputmode="numeric" autocomplete="off" required/>
+                </div>
+            </div>
+
+            <!-- Gmail Integration -->
+            <div class="pt-6 border-t-2 border-black space-y-4">
+                <div>
+                    <h3 class="font-bold text-base">Sinkronisasi Gmail</h3>
+                    <p class="text-sm text-zinc-500 mt-1">Hubungkan Gmail untuk import transaksi Krom Bank otomatis.</p>
+                </div>
+                <div id="gmail-disconnected" class="hidden">
+                    <button id="btn-connect-gmail" type="button" class="flex items-center gap-2 px-4 py-3 border-2 border-black font-bold hover:bg-zinc-100 transition-all w-full justify-center">
+                        <span class="material-symbols-outlined">mail</span>Hubungkan Gmail
+                    </button>
+                </div>
+                <div id="gmail-connected" class="hidden space-y-3">
+                    <div class="flex items-center gap-3 p-3 bg-zinc-100 border-2 border-black">
+                        <span class="material-symbols-outlined" style="color:#166534">check_circle</span>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm">Gmail Terhubung</p>
+                            <p class="text-xs text-zinc-500" id="gmail-sync-time">—</p>
+                        </div>
+                    </div>
+                    <button id="btn-sync-gmail" type="button" class="flex items-center gap-2 px-4 py-3 bg-black text-white font-bold border-2 border-black shadow-[3px_3px_0px_#555] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all w-full justify-center">
+                        <span class="material-symbols-outlined">sync</span>Sync Sekarang
+                    </button>
+                    <button id="btn-disconnect-gmail" type="button" class="flex items-center gap-2 px-4 py-3 border-2 border-black font-bold hover:bg-zinc-100 transition-all w-full justify-center text-error">
+                        <span class="material-symbols-outlined">link_off</span>Putuskan Koneksi
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-4 flex flex-col gap-4">
+                <button class="w-full h-14 bg-black text-white font-bold border-2 border-black shadow-[4px_4px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" type="submit">
+                    Simpan Perubahan
+                </button>
+                <a href="index.html" class="w-full h-14 flex items-center justify-center border-2 border-black font-bold hover:bg-zinc-100 transition-all">Kembali</a>
+            </div>
+        </form>
+    </main>
+
+    <nav class="fixed bottom-0 w-full z-50 border-t-2 border-black bg-white">
+        <div class="flex justify-around items-center h-16 max-w-[1200px] mx-auto">
+            <a href="index.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+                <span class="material-symbols-outlined">dashboard</span><span class="text-xs">Dashboard</span>
+            </a>
+            <a href="transactions.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+                <span class="material-symbols-outlined">add_circle</span><span class="text-xs">Transaksi</span>
+            </a>
+            <a href="riwayat.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+                <span class="material-symbols-outlined">receipt_long</span><span class="text-xs">Riwayat</span>
+            </a>
+            <a href="settings.html" class="flex flex-col items-center justify-center text-secondary font-bold">
+                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">settings</span><span class="text-xs">Setelan</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        function showToast(msg, isError = false) {
+            let t = document.getElementById('_toast');
+            if (!t) { t = document.createElement('div'); t.id = '_toast'; t.className = 'toast'; document.body.appendChild(t); }
+            t.textContent = msg; t.style.background = isError ? '#ba1a1a' : '#000';
+            t.classList.add('show'); clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        function formatRibuan(n) {
+            const num = parseInt(String(n).replace(/\D/g, ''), 10);
+            if (isNaN(num) || num === 0) return '';
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        let currentUser = null;
+
+        (async () => {
+            currentUser = await requireLogin();
+            if (!currentUser) return;
+            document.getElementById('username').value = currentUser.username;
+            document.getElementById('limit').value = formatRibuan(currentUser.monthlyLimit);
+            loadGmailStatus();
+
+            // Check OAuth redirect
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('gmail') === 'connected') showToast('Gmail berhasil terhubung!');
+            if (params.get('gmail') === 'error')     showToast('Gagal menghubungkan Gmail.', true);
+        })();
+
+        const limitInput = document.getElementById('limit');
+        limitInput.addEventListener('input', () => {
+            const d = limitInput.value.replace(/\D/g, '');
+            limitInput.value = d ? formatRibuan(d) : '';
+        });
+        limitInput.addEventListener('keydown', (e) => {
+            const ok = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
+            if (!ok.includes(e.key) && !/^\d$/.test(e.key)) e.preventDefault();
+        });
+
+        document.getElementById('btn-logout').onclick = async () => {
+            await Api.auth.logout();
+            window.location.href = 'login.html';
+        };
+
+        document.getElementById('settings-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.textContent = 'Menyimpan...'; btn.disabled = true;
+            try {
+                const payload = {
+                    username:     document.getElementById('username').value,
+                    monthlyLimit: parseInt(limitInput.value.replace(/\./g, ''), 10),
+                };
+                const pw = document.getElementById('password').value;
+                if (pw) payload.password = pw;
+                await Api.user.updateProfile(payload);
+                showToast('Perubahan berhasil disimpan!');
+                setTimeout(() => window.location.href = 'index.html', 1000);
+            } catch (err) {
+                showToast(err.message, true);
+                btn.textContent = 'Simpan Perubahan'; btn.disabled = false;
+            }
+        };
+
+        // ── Gmail ──────────────────────────────────────────
+        async function loadGmailStatus() {
+            try {
+                const { connected, updatedAt } = await Api.gmail.getStatus();
+                document.getElementById('gmail-disconnected').classList.toggle('hidden', connected);
+                document.getElementById('gmail-connected').classList.toggle('hidden', !connected);
+                if (connected && updatedAt) {
+                    document.getElementById('gmail-sync-time').textContent =
+                        'Terakhir sync: ' + new Date(updatedAt).toLocaleDateString('id-ID',
+                            {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+                }
+            } catch {}
+        }
+
+        document.getElementById('btn-connect-gmail').onclick = async () => {
+            const { url } = await Api.gmail.getConnectUrl();
+            window.location.href = url;
+        };
+
+        document.getElementById('btn-sync-gmail').onclick = async () => {
+            const btn = document.getElementById('btn-sync-gmail');
+            btn.innerHTML = '<span class="material-symbols-outlined">sync</span> Menyinkronkan...';
+            btn.disabled = true;
+            try {
+                const result = await Api.gmail.sync();
+                showToast(`${result.imported} transaksi berhasil diimport!`);
+                loadGmailStatus();
+            } catch (err) {
+                showToast(err.message, true);
+            } finally {
+                btn.innerHTML = '<span class="material-symbols-outlined">sync</span> Sync Sekarang';
+                btn.disabled = false;
+            }
+        };
+
+        document.getElementById('btn-disconnect-gmail').onclick = async () => {
+            await Api.gmail.disconnect();
+            showToast('Gmail berhasil diputus.');
+            loadGmailStatus();
+        };
+    </script>
+</body>
+</html>

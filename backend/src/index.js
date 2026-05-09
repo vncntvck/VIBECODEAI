@@ -1,0 +1,55 @@
+require('dotenv').config();
+const express    = require('express');
+const session    = require('express-session');
+const pgSession  = require('connect-pg-simple')(session);
+const cors       = require('cors');
+const { pool, initDB } = require('./db');
+
+const authRoutes    = require('./routes/auth');
+const txRoutes      = require('./routes/transactions');
+const gmailRoutes   = require('./routes/gmail');
+const userRoutes    = require('./routes/user');
+
+const app  = express();
+const PORT = process.env.PORT || 3000;
+
+// ── Middleware ──────────────────────────────────────────────
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5500',
+  credentials: true,
+}));
+
+app.use(session({
+  store: new pgSession({ pool, tableName: 'user_sessions' }),
+  secret: process.env.SESSION_SECRET || 'dev_secret_change_me',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  },
+}));
+
+// ── Routes ──────────────────────────────────────────────────
+app.use('/api/auth',         authRoutes);
+app.use('/api/transactions', txRoutes);
+app.use('/api/gmail',        gmailRoutes);
+app.use('/api/user',         userRoutes);
+
+// Health check
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
+// ── Start ───────────────────────────────────────────────────
+initDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Fintjam backend running on port ${PORT}`);
+  });
+}).catch(err => {
+  console.error('Failed to initialize database:', err);
+  process.exit(1);
+});
