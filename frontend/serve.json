@@ -1,4 +1,12 @@
 {
   "cleanUrls": false,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/transactions", "destination": "/transactions.html" },
+    { "source": "/riwayat", "destination": "/riwayat.html" },
+    { "source": "/settings", "destination": "/settings.html" },
+    { "source": "/limit-setup", "destination": "/limit-setup.html" }
+  ]
 }
