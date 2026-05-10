@@ -1,10 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Background biru -->
-  <rect width="32" height="32" rx="6" fill="#0051d5"/>
-  <!-- Lingkaran coin kuning -->
-  <circle cx="16" cy="16" r="11" fill="#FFD700" stroke="#000" stroke-width="1.5"/>
-  <!-- Inner ring -->
-  <circle cx="16" cy="16" r="8.5" fill="none" stroke="#000" stroke-width="0.8" opacity="0.3"/>
-  <!-- Simbol Rp -->
-  <text x="9.5" y="21" font-family="Arial Black, Arial" font-weight="900" font-size="12" fill="#000">Rp</text>
+  <!-- Background hitam rounded -->
+  <rect width="32" height="32" rx="6" fill="#000000"/>
+  <!-- Coin putih -->
+  <circle cx="16" cy="16" r="11" fill="#ffffff" stroke="#444" stroke-width="0.5"/>
+  <!-- Inner ring detail -->
+  <circle cx="16" cy="16" r="8" fill="none" stroke="#ccc" stroke-width="0.8"/>
 </svg>
