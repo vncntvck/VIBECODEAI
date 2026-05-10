@@ -93,14 +93,14 @@
                 <button class="w-full h-14 bg-black text-white font-bold border-2 border-black shadow-[4px_4px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" type="submit">
                     Simpan Perubahan
                 </button>
-                <a href="index.html" class="w-full h-14 flex items-center justify-center border-2 border-black font-bold hover:bg-zinc-100 transition-all">Kembali</a>
+                <a href="dashboard.html" class="w-full h-14 flex items-center justify-center border-2 border-black font-bold hover:bg-zinc-100 transition-all">Kembali</a>
             </div>
         </form>
     </main>
 
     <nav class="fixed bottom-0 w-full z-50 border-t-2 border-black bg-white">
         <div class="flex justify-around items-center h-16 max-w-[1200px] mx-auto">
-            <a href="index.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+            <a href="dashboard.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
                 <span class="material-symbols-outlined">dashboard</span><span class="text-xs">Dashboard</span>
             </a>
             <a href="transactions.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
@@ -173,7 +173,7 @@
                 if (pw) payload.password = pw;
                 await Api.user.updateProfile(payload);
                 showToast('Perubahan berhasil disimpan!');
-                setTimeout(() => window.location.href = 'index.html', 1000);
+                setTimeout(() => window.location.href = 'dashboard.html', 1000);
             } catch (err) {
                 showToast(err.message, true);
                 btn.textContent = 'Simpan Perubahan'; btn.disabled = false;
@@ -223,5 +223,6 @@
     </script>
 </body>
 </html>
+
 
 

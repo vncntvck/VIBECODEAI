@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Fintjam Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Fintjam">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script>window.FINTJAM_API_URL = 'https://vibecodeai-production.up.railway.app';</script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: {
+            "error":"#ba1a1a","primary":"#000000","secondary":"#0051d5",
+            "background":"#f8f9ff","surface":"#ffffff","outline-variant":"#c6c6cd",
+            "surface-container-highest":"#d3e4fe","on-surface-variant":"#45464d",
+        }}}}
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-20">
+    <header class="fixed top-0 w-full z-50 bg-white border-b-2 border-black h-16">
+        <div class="flex justify-between items-center px-4 h-full max-w-[1200px] mx-auto">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined text-black text-3xl" data-icon="account_balance_wallet">account_balance_wallet</span>
+                <h1 class="text-xl font-bold text-black">Fintjam</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="exportExcel()" class="flex items-center gap-2 px-4 py-2 bg-white text-black font-bold border-2 border-black shadow-[2px_2px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-zinc-100">
+                    <span class="material-symbols-outlined text-[20px]">table_view</span><span>Export Excel</span>
+                </button>
+                <button onclick="printLaporan()" class="flex items-center gap-2 px-4 py-2 bg-black text-white font-bold border-2 border-black shadow-[2px_2px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
+                    <span class="material-symbols-outlined">print</span><span>Print Laporan</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24 px-4 max-w-[1200px] mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div class="md:col-span-12 bg-black text-white border-2 border-black shadow-[4px_4px_0px_#555] p-5 flex items-center justify-between animate-fade-up">
+                <div class="flex items-center gap-4">
+                    <div class="w-11 h-11 bg-white text-black flex items-center justify-center border-2 border-white font-black text-lg" id="user-avatar">?</div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">Selamat datang kembali</p>
+                        <p class="text-xl font-black" id="welcome-name">-</p>
+                    </div>
+                </div>
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs text-zinc-400 font-bold uppercase tracking-widest">Hari ini</p>
+                    <p class="text-sm font-bold" id="welcome-date">-</p>
+                </div>
+            </div>
+
+            <div class="md:col-span-12 lg:col-span-4 bg-white border-2 border-black shadow-[4px_4px_0px_#000] p-6 space-y-4 card-hover animate-fade-up delay-1">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Total Saldo</h3>
+                <div class="space-y-1">
+                    <p id="total-balance" class="text-3xl font-bold">Rp 0</p>
+                    <p id="current-month-delta" class="text-sm font-bold text-secondary">+Rp 0 (Bulan ini)</p>
+                </div>
+                <div class="pt-4 border-t-2 border-black grid grid-cols-2 gap-4">
+                    <div><p class="text-xs font-bold text-gray-500">Pemasukan</p><p id="total-income" class="font-bold text-success">Rp 0</p></div>
+                    <div><p class="text-xs font-bold text-gray-500">Pengeluaran</p><p id="total-expense" class="font-bold text-error">Rp 0</p></div>
+                </div>
+            </div>
+
+            <div class="md:col-span-12 lg:col-span-8 bg-white border-2 border-black shadow-[4px_4px_0px_#000] p-6 card-hover animate-fade-up delay-2">
+                <div class="flex justify-between items-end mb-8">
+                    <div><h2 class="text-lg font-bold">Ringkasan Bulanan</h2><p class="text-sm text-gray-500">Pemasukan vs Pengeluaran (6 Bulan Terakhir)</p></div>
+                    <div class="flex gap-4">
+                        <div class="flex items-center gap-2 text-sm font-bold"><div class="w-3 h-3 bg-secondary"></div><span>Masuk</span></div>
+                        <div class="flex items-center gap-2 text-sm font-bold"><div class="w-3 h-3 bg-error"></div><span>Keluar</span></div>
+                    </div>
+                </div>
+                <div id="monthly-chart" class="h-52 flex items-end justify-between gap-3 border-b-2 border-black pb-1"></div>
+                <div class="space-y-2 mt-6 pt-5 border-t-2 border-black">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Limit Bulan Ini</span>
+                        <span id="budget-limit" class="text-xs font-bold">Limit: Rp 0</span>
+                    </div>
+                    <div class="w-full h-4 bg-zinc-200 border-2 border-black overflow-hidden flex">
+                        <div id="budget-progress-bar" class="h-full bg-secondary transition-all duration-500" style="width:0%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs font-bold">
+                        <span id="budget-used">Rp 0 terpakai</span>
+                        <span id="budget-pct">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-12 bg-white border-2 border-black shadow-[4px_4px_0px_#000] overflow-hidden card-hover animate-fade-up delay-3">
+                <div class="px-6 py-4 border-b-2 border-black flex justify-between items-center">
+                    <h3 class="text-lg font-bold">Transaksi Terbaru</h3>
+                    <a href="riwayat.html" class="text-secondary font-bold hover:underline">Lihat Semua</a>
+                </div>
+                <div id="recent-transactions" class="divide-y-2 divide-black">
+                    <div class="p-8 text-center text-gray-500">Belum ada transaksi.</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="fixed bottom-24 right-4 z-40">
+        <a href="transactions.html" class="w-14 h-14 bg-black text-white flex items-center justify-center border-2 border-black shadow-[4px_4px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all fab-pulse">
+            <span class="material-symbols-outlined text-2xl">add</span>
+        </a>
+    </div>
+
+    <nav class="fixed bottom-0 w-full z-50 border-t-2 border-black bg-white">
+        <div class="flex justify-around items-center h-16 max-w-[1200px] mx-auto">
+            <a href="dashboard.html" class="flex flex-col items-center justify-center text-secondary font-bold">
+                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">dashboard</span><span class="text-xs">Dashboard</span>
+            </a>
+            <a href="transactions.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+                <span class="material-symbols-outlined">add_circle</span><span class="text-xs">Transaksi</span>
+            </a>
+            <a href="riwayat.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+                <span class="material-symbols-outlined">receipt_long</span><span class="text-xs">Riwayat</span>
+            </a>
+            <a href="settings.html" class="flex flex-col items-center justify-center text-gray-500 hover:text-black">
+                <span class="material-symbols-outlined">settings</span><span class="text-xs">Setelan</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        let user, transactions;
+        (async () => {
+            user = await requireLogin();
+            if (!user) return;
+            if (!user.monthlyLimit) { window.location.href = 'limit-setup.html'; return; }
+            transactions = await Api.transactions.getAll();
+            renderDashboard();
+        })();
+
+        function renderDashboard() {
+            const totalIncome  = transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+            const totalExpense = transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+            const balance = totalIncome - totalExpense;
+            const now = new Date();
+            const curMon = transactions.filter(t=>{ const d=new Date(t.date); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+            const curExp = curMon.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+            const curInc = curMon.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+            const delta  = curInc - curExp;
+
+            document.getElementById('total-balance').textContent = Utils.formatCurrency(balance);
+            document.getElementById('total-income').textContent  = Utils.formatCurrency(totalIncome);
+            document.getElementById('total-expense').textContent = Utils.formatCurrency(totalExpense);
+            document.getElementById('current-month-delta').textContent = (delta>=0?'+':'')+Utils.formatCurrency(delta)+' (Bulan ini)';
+            document.getElementById('welcome-name').textContent   = user.username;
+            document.getElementById('user-avatar').textContent    = user.username.charAt(0).toUpperCase();
+            document.getElementById('welcome-date').textContent   = now.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+            const limit = user.monthlyLimit;
+            const pct   = limit>0 ? Math.min(100,(curExp/limit)*100) : 0;
+            document.getElementById('budget-progress-bar').style.width = pct+'%';
+            document.getElementById('budget-used').textContent  = Utils.formatCurrency(curExp)+' terpakai';
+            document.getElementById('budget-limit').textContent = 'Limit: '+Utils.formatCurrency(limit);
+            document.getElementById('budget-pct').textContent   = pct.toFixed(1)+'%';
+            if (pct>=100) document.getElementById('budget-progress-bar').classList.replace('bg-secondary','bg-error');
+
+            const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+            const monthData = [];
+            for (let i=5;i>=0;i--) {
+                const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+                const m=d.getMonth(), y=d.getFullYear();
+                const tx=transactions.filter(t=>{ const td=new Date(t.date); return td.getMonth()===m&&td.getFullYear()===y; });
+                monthData.push({ label:MONTHS[m], income:tx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0), expense:tx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0) });
+            }
+            const maxVal = Math.max(...monthData.flatMap(m=>[m.income,m.expense]),1);
+            document.getElementById('monthly-chart').innerHTML = monthData.map((m,i)=>{
+                const ip=Math.max(2,(m.income/maxVal)*100), ep=Math.max(2,(m.expense/maxVal)*100), dl=0.5+i*0.08;
+                const empty=m.income===0&&m.expense===0;
+                return `<div class="flex-1 flex flex-col items-center gap-1 h-full group">
+                    <div class="w-full flex flex-col items-center gap-[3px] h-full justify-end">
+                        <div class="relative w-full flex justify-center gap-[3px] items-end" style="height:100%">
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] font-bold px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
+                                <div class="text-blue-300">+${Utils.formatCurrency(m.income)}</div>
+                                <div class="text-red-300">-${Utils.formatCurrency(m.expense)}</div>
+                            </div>
+                            ${empty ? '<div class="w-4 bg-zinc-200 border border-zinc-300" style="height:4px"></div>'
+                                    : `<div class="w-4 bg-secondary border-2 border-black chart-bar" style="height:${ip}%;animation-delay:${dl}s"></div>
+                                       <div class="w-4 bg-error border-2 border-black chart-bar" style="height:${ep}%;animation-delay:${dl+0.04}s"></div>`}
+                        </div>
+                    </div>
+                    <span class="text-[11px] font-bold text-gray-500 mt-1">${m.label}</span>
+                </div>`;
+            }).join('');
+
+            const recentList = document.getElementById('recent-transactions');
+            if (transactions.length>0) {
+                recentList.innerHTML = [...transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5).map((t,i)=>`
+                    <div class="px-6 py-4 flex items-center justify-between hover:bg-zinc-50 transition-colors tx-row" style="animation-delay:${0.5+i*0.1}s">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center border-2 border-black rounded bg-zinc-100">
+                                <span class="material-symbols-outlined text-black">${t.type==='income'?'payments':'shopping_bag'}</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">${t.note||t.category}</p>
+                                <div class="flex gap-2 items-center">
+                                    <span class="px-2 py-0.5 bg-zinc-200 border border-black text-[10px] font-bold uppercase">${t.category}</span>
+                                    <span class="text-xs text-gray-500">${new Date(t.date).toLocaleDateString('id-ID')}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="font-bold ${t.type==='income'?'text-success':'text-error'}">${t.type==='income'?'+':'-'}${Utils.formatCurrency(t.amount)}</p>
+                    </div>`).join('');
+            }
+            UI.updateBudgetAlerts(user, transactions);
+        }
+
+        function exportExcel() {
+            if (!transactions) return;
+            const now=new Date(), sorted=[...transactions].sort((a,b)=>new Date(b.date)-new Date(a.date));
+            const txRows=sorted.map(t=>({'Tanggal':new Date(t.date).toLocaleDateString('id-ID'),'Catatan':t.note||'-','Kategori':t.category,'Tipe':t.type==='income'?'Pemasukan':'Pengeluaran','Nominal (IDR)':t.amount}));
+            const totalIncome=transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+            const totalExpense=transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+            const MN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            const sumRows=[];
+            for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);const m=d.getMonth(),y=d.getFullYear();const tx=transactions.filter(t=>{const td=new Date(t.date);return td.getMonth()===m&&td.getFullYear()===y;});sumRows.push({'Bulan':`${MN[m]} ${y}`,'Pemasukan (IDR)':tx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0),'Pengeluaran (IDR)':tx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0),'Selisih (IDR)':tx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0)-tx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0)});}
+            sumRows.push({});sumRows.push({'Bulan':'TOTAL KESELURUHAN','Pemasukan (IDR)':totalIncome,'Pengeluaran (IDR)':totalExpense,'Selisih (IDR)':totalIncome-totalExpense});
+            const wb=XLSX.utils.book_new();
+            const wsTx=XLSX.utils.json_to_sheet(txRows.length>0?txRows:[{'Info':'Belum ada transaksi.'}]);
+            XLSX.utils.book_append_sheet(wb,wsTx,'Transaksi');
+            const wsSummary=XLSX.utils.json_to_sheet(sumRows);
+            XLSX.utils.book_append_sheet(wb,wsSummary,'Ringkasan Bulanan');
+            wsTx['!cols']=[{wch:14},{wch:28},{wch:20},{wch:14},{wch:18}];
+            wsSummary['!cols']=[{wch:22},{wch:20},{wch:20},{wch:18}];
+            XLSX.writeFile(wb,`Fintjam_${user.username}_${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}.xlsx`);
+        }
+
+        function printLaporan() {
+            if (!transactions) return;
+            const now=new Date();
+            const bulanTahun=now.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+            const tanggalCetak=now.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+            const totalIncome=transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+            const totalExpense=transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+            const balance=totalIncome-totalExpense;
+            const curMon=transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+            const monthExpense=curMon.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+            const monthIncome=curMon.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+            const limitPct=user.monthlyLimit>0?Math.min(100,(monthExpense/user.monthlyLimit)*100).toFixed(1):0;
+            const sorted=[...transactions].sort((a,b)=>new Date(b.date)-new Date(a.date));
+            const rows=sorted.length>0?sorted.map((t,i)=>`<tr style="background:${i%2===0?'#fff':'#f8f9ff'}"><td style="padding:10px 14px;border:1px solid #ddd;">${new Date(t.date).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}</td><td style="padding:10px 14px;border:1px solid #ddd;">${t.note||'-'}</td><td style="padding:10px 14px;border:1px solid #ddd;">${t.category}</td><td style="padding:10px 14px;border:1px solid #ddd;text-align:center;"><span style="padding:2px 10px;font-size:11px;font-weight:700;border:1.5px solid ${t.type==='income'?'#166534':'#ba1a1a'};color:${t.type==='income'?'#166534':'#ba1a1a'};text-transform:uppercase;">${t.type==='income'?'Masuk':'Keluar'}</span></td><td style="padding:10px 14px;border:1px solid #ddd;text-align:right;font-weight:700;color:${t.type==='income'?'#166534':'#ba1a1a'};">${t.type==='income'?'+':'-'}${Utils.formatCurrency(t.amount)}</td></tr>`).join(''):`<tr><td colspan="5" style="padding:24px;text-align:center;color:#888;">Belum ada transaksi.</td></tr>`;
+            const win=window.open('','_blank','width=900,height=700');
+            win.document.write(`<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"/><title>Laporan Keuangan Fintjam</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Fintjam">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;color:#111;background:#fff;padding:40px 48px;font-size:13px;line-height:1.6}.rh{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #000;padding-bottom:20px;margin-bottom:28px}.bi{width:40px;height:40px;background:#000;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;font-weight:900}.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}.sc{border:2px solid #000;padding:14px 16px}.sc .l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#555;margin-bottom:6px}.sc .v{font-size:18px;font-weight:800}table{width:100%;border-collapse:collapse}thead tr{background:#000;color:#fff}thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase}@media print{body{padding:20px 28px}@page{margin:1cm;size:A4}}</style></head><body><div class="rh"><div style="display:flex;align-items:center;gap:10px"><div class="bi">F</div><div><div style="font-size:22px;font-weight:800">Fintjam</div><div style="font-size:11px;color:#555">Laporan Keuangan Personal</div></div></div><div style="text-align:right"><h2 style="font-size:16px;font-weight:700">Laporan Keuangan</h2><p style="font-size:11px;color:#555;margin-top:4px">Periode: ${bulanTahun}</p><p style="font-size:11px;color:#555;margin-top:4px">Dicetak: ${tanggalCetak}</p><p style="font-size:11px;color:#555;margin-top:4px">Akun: <strong>${user.username}</strong></p></div></div><div class="sg"><div class="sc"><div class="l">Total Saldo</div><div class="v">${Utils.formatCurrency(balance)}</div></div><div class="sc"><div class="l">Total Pemasukan</div><div class="v" style="color:#166534">${Utils.formatCurrency(totalIncome)}</div></div><div class="sc"><div class="l">Total Pengeluaran</div><div class="v" style="color:#ba1a1a">${Utils.formatCurrency(totalExpense)}</div></div><div class="sc"><div class="l">Limit Bulanan</div><div class="v" style="color:#0051d5">${Utils.formatCurrency(user.monthlyLimit)}</div></div></div><div style="border:2px solid #000;padding:16px 18px;margin-bottom:28px"><h3 style="font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:10px">Penggunaan Limit Bulan Ini</h3><div style="background:#e5e7eb;height:18px;border:1.5px solid #000;overflow:hidden;margin-bottom:6px"><div style="height:100%;background:${parseFloat(limitPct)>=100?'#ba1a1a':'#0051d5'};width:${limitPct}%"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700"><span>${Utils.formatCurrency(monthExpense)} terpakai (${limitPct}%)</span><span>Limit: ${Utils.formatCurrency(user.monthlyLimit)}</span></div></div><div style="border:2px solid #000;padding:16px 18px;margin-bottom:28px;display:grid;grid-template-columns:1fr 1fr;gap:16px"><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#555;margin-bottom:4px">Pemasukan Bulan Ini</div><div style="font-size:15px;font-weight:800;color:#166534">${Utils.formatCurrency(monthIncome)}</div></div><div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#555;margin-bottom:4px">Pengeluaran Bulan Ini</div><div style="font-size:15px;font-weight:800;color:#ba1a1a">${Utils.formatCurrency(monthExpense)}</div></div></div><div><h3 style="font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:10px">Riwayat Semua Transaksi (${sorted.length} transaksi)</h3><table><thead><tr><th>Tanggal</th><th>Catatan</th><th>Kategori</th><th style="text-align:center">Tipe</th><th style="text-align:right">Nominal</th></tr></thead><tbody>${rows}</tbody></table></div><div style="margin-top:32px;padding-top:14px;border-top:2px solid #000;display:flex;justify-content:space-between;font-size:10px;color:#888"><span>Fintjam - Laporan Keuangan Personal</span><span>Digenerate otomatis pada ${tanggalCetak}</span></div><script>window.onload=()=>{window.print();}<\/script>
+</body></html>`);
+            win.document.close();
+        }
+    </script>
+</body>
+</html>
+
+
+
+

@@ -54,7 +54,7 @@
         (async () => {
             currentUser = await requireLogin();
             if (!currentUser) return;
-            if (currentUser.monthlyLimit > 0) window.location.href = 'index.html';
+            if (currentUser.monthlyLimit > 0) window.location.href = 'dashboard.html';
         })();
 
         function formatRibuan(n) {
@@ -83,7 +83,7 @@
             btn.disabled = true;
             try {
                 await Api.user.updateProfile({ username: currentUser.username, monthlyLimit: limit });
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             } catch (err) {
                 btn.textContent = 'Simpan & Lanjut ke Dashboard';
                 btn.disabled = false;
@@ -92,5 +92,6 @@
     </script>
 </body>
 </html>
+
 
 

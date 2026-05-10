@@ -2,7 +2,7 @@
   "name": "Fintjam",
   "short_name": "Fintjam",
   "description": "Manajemen keuangan personal",
-  "start_url": "/login.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#f8f9ff",
   "theme_color": "#000000",
