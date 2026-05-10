@@ -18,8 +18,12 @@ app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS — allow semua origin (JWT auth, tidak butuh credentials)
-app.use(cors());
+// CORS — allow all origins and headers for JWT auth
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // ── Routes ──────────────────────────────────────────────────
 app.use('/api/auth',         authRoutes);

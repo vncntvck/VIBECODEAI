@@ -29,7 +29,7 @@ router.post('/register', async (req, res) => {
     const token = makeToken(user.id);
     res.status(201).json({
       token,
-      user: { id: user.id, username: user.username, monthlyLimit: user.monthly_limit }
+      user: { id: user.id, username: user.username, monthlyLimit: Number(user.monthly_limit) }
     });
   } catch (err) {
     console.error(err);
@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
     const token = makeToken(user.id);
     res.json({
       token,
-      user: { id: user.id, username: user.username, monthlyLimit: user.monthly_limit }
+      user: { id: user.id, username: user.username, monthlyLimit: Number(user.monthly_limit) }
     });
   } catch (err) {
     console.error(err);
@@ -80,7 +80,7 @@ router.get('/me', async (req, res) => {
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
     const u = result.rows[0];
-    res.json({ user: { id: u.id, username: u.username, monthlyLimit: u.monthly_limit } });
+    res.json({ user: { id: u.id, username: u.username, monthlyLimit: Number(u.monthly_limit) } });
   } catch (err) {
     res.status(401).json({ error: 'Token tidak valid' });
   }

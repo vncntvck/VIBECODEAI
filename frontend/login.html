@@ -107,7 +107,7 @@
   <script>
     // Cek kalau sudah login
     Api.auth.me().then(({ user }) => {
-      window.location.href = user.monthlyLimit > 0 ? 'index.html' : 'limit-setup.html';
+      window.location.href = user.monthlyLimit > 0 ? 'dashboard.html' : 'limit-setup.html';
     }).catch(() => {});
 
     function showToast(msg, isError = false) {
@@ -151,7 +151,7 @@
           document.getElementById('login-username').value,
           document.getElementById('login-password').value
         );
-        window.location.href = user.monthlyLimit > 0 ? 'index.html' : 'limit-setup.html';
+        window.location.href = user.monthlyLimit > 0 ? 'dashboard.html' : 'limit-setup.html';
       } catch (err) {
         showToast(err.message, true);
         btn.textContent = 'Masuk Sekarang'; btn.disabled = false;

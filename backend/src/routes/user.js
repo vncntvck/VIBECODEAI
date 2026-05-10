@@ -30,7 +30,7 @@ router.put('/profile', requireAuth, async (req, res) => {
 
     const result = await pool.query(query, params);
     const u = result.rows[0];
-    res.json({ user: { id: u.id, username: u.username, monthlyLimit: u.monthly_limit } });
+    res.json({ user: { id: u.id, username: u.username, monthlyLimit: Number(u.monthly_limit) } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
